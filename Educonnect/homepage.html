@@ -1,0 +1,934 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>EduConnect • Empowering Minds, Connecting Futures</title>
+
+    <!-- Google Fonts: Plus Jakarta Sans -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+
+    <!-- GSAP Animation Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+
+    <style>
+        :root {
+            --bg-dark: #07090e;
+            --bg-surface: rgba(15, 23, 42, 0.65);
+            --surface-border: rgba(255, 255, 255, 0.08);
+            --accent-gradient: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #06b6d4 100%);
+            --accent-glow: rgba(99, 102, 241, 0.25);
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --text-dim: #64748b;
+            --radius-pill: 9999px;
+            --radius-xl: 20px;
+            --radius-lg: 14px;
+            --radius-md: 10px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+            -webkit-font-smoothing: antialiased;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            min-height: 100vh;
+            min-height: 100dvh;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        .ambient-canvas {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 0;
+            overflow: hidden;
+        }
+
+        .ambient-orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(100px);
+            opacity: 0.35;
+            will-change: transform;
+        }
+
+        .orb-purple {
+            width: min(500px, 90vw);
+            height: min(500px, 90vw);
+            background: radial-gradient(circle, #6366f1 0%, transparent 70%);
+            top: -100px;
+            left: 10%;
+        }
+
+        .orb-cyan {
+            width: min(450px, 85vw);
+            height: min(450px, 85vw);
+            background: radial-gradient(circle, #06b6d4 0%, transparent 70%);
+            bottom: 5%;
+            right: 5%;
+        }
+
+        .grid-lines {
+            position: fixed;
+            inset: 0;
+            background-image:
+                linear-gradient(to right, rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+            background-size: 40px 40px;
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        .nav-wrapper {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 100;
+            padding: 16px 24px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .navbar {
+            width: 100%;
+            max-width: 1180px;
+            height: 64px;
+            background: rgba(11, 15, 25, 0.75);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--surface-border);
+            border-radius: var(--radius-pill);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 24px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35);
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+            color: var(--text-main);
+            font-weight: 700;
+            font-size: 1.18rem;
+            letter-spacing: -0.02em;
+        }
+
+        .brand-icon {
+            width: 34px;
+            height: 34px;
+            border-radius: 10px;
+            background: var(--accent-gradient);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 14px var(--accent-glow);
+        }
+
+        .brand-icon svg {
+            width: 18px;
+            height: 18px;
+            stroke: white;
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 32px;
+            list-style: none;
+        }
+
+        .nav-link {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.92rem;
+            font-weight: 500;
+            transition: color 0.2s ease;
+            position: relative;
+        }
+
+        .nav-link:hover {
+            color: var(--text-main);
+        }
+
+        .nav-actions {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .btn-nav-primary {
+            background: var(--accent-gradient);
+            color: white;
+            border: none;
+            padding: 9px 20px;
+            border-radius: var(--radius-pill);
+            font-size: 0.88rem;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            box-shadow: 0 4px 16px var(--accent-glow);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .btn-nav-primary:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 22px rgba(99, 102, 241, 0.4);
+        }
+
+        .btn-menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: var(--text-main);
+            padding: 6px;
+        }
+
+        .mobile-menu {
+            display: none;
+            position: fixed;
+            top: 90px;
+            left: 16px;
+            right: 16px;
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border: 1px solid var(--surface-border);
+            border-radius: var(--radius-xl);
+            padding: 24px;
+            flex-direction: column;
+            gap: 18px;
+            z-index: 99;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
+            transform-origin: top center;
+        }
+
+        .mobile-menu.open {
+            display: flex;
+        }
+
+        .mobile-nav-link {
+            color: var(--text-main);
+            text-decoration: none;
+            font-size: 1.05rem;
+            font-weight: 500;
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .hero-container {
+            position: relative;
+            z-index: 10;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 140px 24px 70px;
+            display: grid;
+            grid-template-columns: 1.15fr 0.85fr;
+            align-items: center;
+            gap: 50px;
+            min-height: 100vh;
+            min-height: 100dvh;
+        }
+
+        .hero-content {
+            max-width: 600px;
+        }
+
+        .badge-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 14px;
+            background: rgba(99, 102, 241, 0.1);
+            border: 1px solid rgba(99, 102, 241, 0.3);
+            border-radius: var(--radius-pill);
+            font-size: 0.82rem;
+            font-weight: 600;
+            color: #a5b4fc;
+            margin-bottom: 22px;
+        }
+
+        .badge-dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: #38bdf8;
+            box-shadow: 0 0 10px #38bdf8;
+        }
+
+        .hero-title {
+            font-size: clamp(2.3rem, 5.2vw, 3.75rem);
+            font-weight: 800;
+            line-height: 1.12;
+            letter-spacing: -0.035em;
+            margin-bottom: 20px;
+        }
+
+        .gradient-text {
+            background: linear-gradient(135deg, #ffffff 20%, #a5b4fc 60%, #38bdf8 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero-subtitle {
+            font-size: clamp(1rem, 1.8vw, 1.15rem);
+            line-height: 1.6;
+            color: var(--text-muted);
+            margin-bottom: 34px;
+            font-weight: 400;
+        }
+
+        .hero-cta-group {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            flex-wrap: wrap;
+            margin-bottom: 36px;
+        }
+
+        .btn-hero-primary {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background: var(--accent-gradient);
+            color: #fff;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.98rem;
+            padding: 14px 28px;
+            border-radius: var(--radius-pill);
+            box-shadow: 0 8px 24px var(--accent-glow);
+            transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s ease;
+            cursor: pointer;
+            border: none;
+        }
+
+        .btn-hero-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 32px rgba(99, 102, 241, 0.45);
+        }
+
+        .btn-hero-primary svg {
+            width: 17px;
+            height: 17px;
+            transition: transform 0.2s ease;
+        }
+
+        .btn-hero-primary:hover svg {
+            transform: translateX(3px);
+        }
+
+        .btn-hero-secondary {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--surface-border);
+            color: var(--text-main);
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.98rem;
+            padding: 14px 26px;
+            border-radius: var(--radius-pill);
+            transition: background 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+        }
+
+        .btn-hero-secondary:hover {
+            background: rgba(255, 255, 255, 0.09);
+            border-color: rgba(255, 255, 255, 0.16);
+            transform: translateY(-1px);
+        }
+
+        .social-proof {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .avatars {
+            display: flex;
+            align-items: center;
+        }
+
+        .avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            border: 2px solid var(--bg-dark);
+            margin-left: -8px;
+            background: #1e293b;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.72rem;
+            font-weight: 700;
+            color: #94a3b8;
+        }
+
+        .avatar:first-child {
+            margin-left: 0;
+        }
+
+        .avatar-1 {
+            background: #3b82f6;
+            color: white;
+        }
+
+        .avatar-2 {
+            background: #8b5cf6;
+            color: white;
+        }
+
+        .avatar-3 {
+            background: #ec4899;
+            color: white;
+        }
+
+        .proof-text {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        .proof-text strong {
+            color: var(--text-main);
+        }
+
+        .hero-visual {
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .dashboard-preview {
+            width: 100%;
+            max-width: 440px;
+            background: var(--bg-surface);
+            border: 1px solid var(--surface-border);
+            border-radius: var(--radius-xl);
+            padding: 24px;
+            backdrop-filter: blur(28px);
+            -webkit-backdrop-filter: blur(28px);
+            box-shadow:
+                0 24px 60px rgba(0, 0, 0, 0.5),
+                inset 0 1px 1px rgba(255, 255, 255, 0.1);
+            position: relative;
+        }
+
+        .preview-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            padding-bottom: 14px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+        }
+
+        .header-user {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .user-avatar-mini {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            background: var(--accent-gradient);
+        }
+
+        .user-meta-title {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-main);
+        }
+
+        .user-meta-sub {
+            font-size: 0.72rem;
+            color: var(--text-dim);
+        }
+
+        .status-badge {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.74rem;
+            color: #34d399;
+            background: rgba(16, 185, 129, 0.1);
+            padding: 4px 10px;
+            border-radius: var(--radius-pill);
+            border: 1px solid rgba(52, 211, 153, 0.25);
+        }
+
+        .status-pulse {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: #34d399;
+        }
+
+        /* Course items inside preview */
+        .course-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .course-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: var(--radius-lg);
+            padding: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .course-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .course-symbol {
+            width: 38px;
+            height: 38px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.95rem;
+        }
+
+        .symbol-math {
+            background: rgba(99, 102, 241, 0.15);
+            color: #818cf8;
+        }
+
+        .symbol-cs {
+            background: rgba(6, 182, 212, 0.15);
+            color: #22d3ee;
+        }
+
+        .course-title {
+            font-size: 0.88rem;
+            font-weight: 600;
+            color: var(--text-main);
+            margin-bottom: 2px;
+        }
+
+        .course-meta {
+            font-size: 0.74rem;
+            color: var(--text-dim);
+        }
+
+        .progress-bar-wrap {
+            width: 60px;
+            height: 5px;
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: var(--radius-pill);
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: var(--accent-gradient);
+            border-radius: var(--radius-pill);
+        }
+
+        /* Floating micro badges */
+        .float-badge {
+            position: absolute;
+            background: rgba(17, 24, 39, 0.85);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: var(--radius-lg);
+            padding: 12px 16px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 16px 36px rgba(0, 0, 0, 0.45);
+            z-index: 2;
+        }
+
+        .float-badge-top {
+            top: -24px;
+            right: -18px;
+        }
+
+        .float-badge-bottom {
+            bottom: -22px;
+            left: -18px;
+        }
+
+        .float-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .float-icon.sparkle {
+            background: rgba(245, 158, 11, 0.15);
+            color: #fbbf24;
+        }
+
+        .float-icon.teacher {
+            background: rgba(99, 102, 241, 0.15);
+            color: #818cf8;
+        }
+
+        .float-title {
+            font-size: 0.72rem;
+            color: var(--text-dim);
+        }
+
+        .float-value {
+            font-size: 0.88rem;
+            font-weight: 700;
+            color: var(--text-main);
+        }
+
+        @media (max-width: 960px) {
+            .hero-container {
+                grid-template-columns: 1fr;
+                padding-top: 120px;
+                text-align: center;
+                gap: 60px;
+            }
+
+            .hero-content {
+                max-width: 100%;
+                margin: 0 auto;
+            }
+
+            .hero-cta-group {
+                justify-content: center;
+            }
+
+            .social-proof {
+                justify-content: center;
+            }
+
+            .float-badge-top {
+                right: 0px;
+            }
+
+            .float-badge-bottom {
+                left: 0px;
+            }
+        }
+
+        @media (max-width: 768px) {
+
+            .nav-links,
+            .nav-actions .btn-nav-primary {
+                display: none;
+            }
+
+            .btn-menu-toggle {
+                display: block;
+            }
+
+            .navbar {
+                padding: 0 16px;
+            }
+
+            .hero-container {
+                padding-top: 110px;
+                padding-bottom: 50px;
+            }
+
+            .float-badge {
+                padding: 8px 12px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="ambient-canvas">
+        <div class="ambient-orb orb-purple"></div>
+        <div class="ambient-orb orb-cyan"></div>
+    </div>
+    <div class="grid-lines"></div>
+
+    <header class="nav-wrapper">
+        <nav class="navbar" id="mainNavbar">
+            <!-- Brand Logo -->
+            <a href="#" class="brand">
+                <div class="brand-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke-width="2.3" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M22 10v6M2 10l10-5 10 5-10 5z" />
+                        <path d="M6 12v5c3 3 9 3 12 0v-5" />
+                    </svg>
+                </div>
+                <span>EduConnect</span>
+            </a>
+
+            <!-- Desktop Links -->
+            <ul class="nav-links">
+                <li><a href="#dashboard" class="nav-link">Dashboard</a></li>
+                <li><a href="#assignments" class="nav-link">Assignments</a></li>
+                <li><a href="#teachers" class="nav-link">Teachers</a></li>
+            </ul>
+
+            <!-- Action Button / Mobile Toggle -->
+            <div class="nav-actions">
+                <a href="#signin" class="btn-nav-primary">Get Started</a>
+                <button class="btn-menu-toggle" id="menuToggle" aria-label="Toggle Navigation Menu">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="3" y1="12" x2="21" y2="12" />
+                        <line x1="3" y1="6" x2="21" y2="6" />
+                        <line x1="3" y1="18" x2="21" y2="18" />
+                    </svg>
+                </button>
+            </div>
+        </nav>
+    </header>
+
+    <div class="mobile-menu" id="mobileMenu">
+        <a href="#dashboard" class="mobile-nav-link" onclick="closeMobileMenu()">Dashboard</a>
+        <a href="#assignments" class="mobile-nav-link" onclick="closeMobileMenu()">Assignments</a>
+        <a href="#teachers" class="mobile-nav-link" onclick="closeMobileMenu()">Teachers</a>
+        <a href="#signin" class="btn-hero-primary" style="justify-content: center; margin-top: 8px;"
+            onclick="closeMobileMenu()">Get Started</a>
+    </div>
+
+    <main class="hero-container">
+        <!-- Left Column: Content -->
+        <section class="hero-content">
+            <div class="badge-pill gsap-hero-item">
+                <span class="badge-dot"></span>
+                <span>Next-Gen Education Platform</span>
+            </div>
+
+            <h1 class="hero-title gsap-hero-item">
+                Empowering Minds, <br />
+                <span class="gradient-text">Connecting Futures.</span>
+            </h1>
+
+            <p class="hero-subtitle gsap-hero-item">
+                EduConnect bridges students, educators, and interactive coursework in one seamless ecosystem. Organize
+                assignments, consult top mentors, and track real progress in real time.
+            </p>
+
+            <div class="hero-cta-group gsap-hero-item">
+                <a href="#get-started" class="btn-hero-primary">
+                    <span>Get Started</span>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <line x1="5" y1="12" x2="19" y2="12" />
+                        <polyline points="12 5 19 12 12 19" />
+                    </svg>
+                </a>
+                <a href="#demo" class="btn-hero-secondary">Explore Platform</a>
+            </div>
+
+            <!-- <div class="social-proof gsap-hero-item">
+                <div class="avatars">
+                    <div class="avatar avatar-1">JD</div>
+                    <div class="avatar avatar-2">SK</div>
+                    <div class="avatar avatar-3">AL</div>
+                </div>
+                <p class="proof-text">
+                    Joined by <strong>12,000+ students</strong> and educators worldwide.
+                </p>
+            </div>
+        </section> -->
+
+        <!-- Right Column: Visual Dashboard Mockup -->
+        <section class="hero-visual">
+            <!-- Floating Badge: Success Rate -->
+            <div class="float-badge float-badge-top gsap-float-badge" id="floatTop">
+                <div class="float-icon sparkle">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <polygon
+                            points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+                    </svg>
+                </div>
+                <div>
+                    <!-- <div class="float-title">Course Completion</div>
+                    <div class="float-value">98.4% Average</div> -->
+                </div>
+            </div>
+
+            <!-- Core Glassmorphic Dashboard Card
+            <div class="dashboard-preview" id="mainCard">
+                <div class="preview-header">
+                    <div class="header-user">
+                        <div class="user-avatar-mini"></div>
+                        <div>
+                            <div class="user-meta-title">Spring Term '26</div>
+                            <div class="user-meta-sub">Enrolled in 4 classes</div>
+                        </div>
+                    </div>
+                    <div class="status-badge">
+                        <span class="status-pulse"></span>
+                        <span>Live Session</span>
+                    </div>
+                </div> -->
+<!-- 
+                <div class="course-list">
+                    <div class="course-card">
+                        <div class="course-info">
+                            <div class="course-symbol symbol-math">∑</div>
+                            <div>
+                                <div class="course-title">Applied Calculus II</div>
+                                <div class="course-meta">Prof. Harrison • Due Tomorrow</div>
+                            </div>
+                        </div>
+                        <div class="progress-bar-wrap">
+                            <div class="progress-fill" style="width: 82%;"></div>
+                        </div>
+                    </div>
+
+                    <div class="course-card">
+                        <div class="course-info">
+                            <div class="course-symbol symbol-cs">&lt;/&gt;</div>
+                            <div>
+                                <div class="course-title">Algorithms & Data</div>
+                                <div class="course-meta">Dr. Elena Chen • 3 Modules left</div>
+                            </div>
+                        </div>
+ v>
+            </div>                       <div class="progress-bar-wrap">
+                            <div class="progress-fill" style="width: 64%;"></div>
+                        </div>
+                    </div>
+                </di -->
+
+            <!-- Floating Badge: Mentors -->
+            <!-- <div class="float-badge float-badge-bottom gsap-float-badge" id="floatBottom">
+                <div class="float-icon teacher">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                        <circle cx="9" cy="7" r="4" />
+                        <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+                        <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+                    </svg>
+                </div>
+                <div>
+                    <div class="float-title">Verified Educators</div>
+                    <div class="float-value">850+ Active Teachers</div>
+                </div>
+            </div> -->
+        </section>
+    </main>
+
+    <script>
+        // Safe Mobile Menu Handler
+        const menuToggle = document.getElementById('menuToggle');
+        const mobileMenu = document.getElementById('mobileMenu');
+        let isMenuOpen = false;
+
+        menuToggle.addEventListener('click', () => {
+            isMenuOpen = !isMenuOpen;
+            if (isMenuOpen) {
+                mobileMenu.classList.add('open');
+                gsap.fromTo(mobileMenu,
+                    { opacity: 0, y: -12, scale: 0.98 },
+                    { opacity: 1, y: 0, scale: 1, duration: 0.28, ease: 'power2.out' }
+                );
+            } else {
+                closeMobileMenu();
+            }
+        });
+
+        function closeMobileMenu() {
+            if (!isMenuOpen) return;
+            gsap.to(mobileMenu, {
+                opacity: 0,
+                y: -10,
+                duration: 0.2,
+                ease: 'power2.in',
+                onComplete: () => {
+                    mobileMenu.classList.remove('open');
+                    isMenuOpen = false;
+                }
+            });
+        }
+
+        // GSAP Startup Entrance Orchestration
+        window.addEventListener('DOMContentLoaded', () => {
+            const tl = gsap.timeline({ defaults: { ease: 'power3.out' } });
+
+            // 1. Navigation Slide & Fade
+            tl.from('#mainNavbar', {
+                y: -30,
+                opacity: 0,
+                duration: 0.7,
+                ease: 'power2.out'
+            })
+                // 2. Hero Typography & Content Stagger
+                .from('.gsap-hero-item', {
+                    y: 25,
+                    opacity: 0,
+                    duration: 0.65,
+                    stagger: 0.1
+                }, "-=0.35")
+                // 3. Central Glassmorphic Card Reveal
+                .from('#mainCard', {
+                    scale: 0.94,
+                    y: 35,
+                    opacity: 0,
+                    duration: 0.8,
+                    ease: 'power3.out'
+                }, "-=0.5")
+                // 4. Floating Micro Badges Pop-in
+                .from('.gsap-float-badge', {
+                    scale: 0.8,
+                    opacity: 0,
+                    duration: 0.5,
+                    stagger: 0.15,
+                    ease: 'back.out(1.7)'
+                }, "-=0.3");
+
+            // Continuous Subtle Floating Loop for Badges
+            gsap.to('#floatTop', {
+                y: -10,
+                duration: 2.8,
+                repeat: -1,
+                yoyo: true,
+                ease: 'sine.inOut'
+            });
+
+            gsap.to('#floatBottom', {
+                y: 10,
+                duration: 3.2,
+                repeat: -1,
+                yoyo: true,
+                ease: 'sine.inOut',
+                delay: 0.4
+            });
+        });
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,1937 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>EduConnect Dashboard • Collaborative Hub</title>
+
+  <!-- Google Fonts: Plus Jakarta Sans -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- GSAP Animation Library -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+
+  <style>
+    :root {
+      --bg-base: #07090e;
+      --bg-panel: rgba(15, 23, 42, 0.72);
+      --bg-panel-hover: rgba(30, 41, 59, 0.65);
+      --bg-card: rgba(26, 34, 56, 0.5);
+      --border-subtle: rgba(255, 255, 255, 0.08);
+      --border-focus: rgba(99, 102, 241, 0.5);
+      --accent-gradient: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #06b6d4 100%);
+      --accent-solid: #6366f1;
+      --emerald-accent: #10b981;
+      --amber-accent: #f59e0b;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --text-dim: #64748b;
+      --radius-pill: 9999px;
+      --radius-lg: 16px;
+      --radius-md: 10px;
+      --radius-sm: 6px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      -webkit-font-smoothing: antialiased;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      background-color: var(--bg-base);
+      color: var(--text-main);
+      min-height: 100vh;
+      min-height: 100dvh;
+      overflow-x: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Ambient background orbs */
+    .ambient-canvas {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+      overflow: hidden;
+    }
+    .ambient-orb {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(120px);
+      opacity: 0.28;
+      will-change: transform;
+    }
+    .orb-1 {
+      width: 500px;
+      height: 500px;
+      background: radial-gradient(circle, #6366f1, transparent 70%);
+      top: -120px;
+      left: -80px;
+    }
+    .orb-2 {
+      width: 450px;
+      height: 450px;
+      background: radial-gradient(circle, #06b6d4, transparent 70%);
+      bottom: -100px;
+      right: -80px;
+    }
+
+    /* Subtle grid pattern overlay */
+    .grid-lines {
+      position: fixed;
+      inset: 0;
+      background-image: 
+        linear-gradient(to right, rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+      background-size: 36px 36px;
+      z-index: 1;
+      pointer-events: none;
+    }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 40;
+      background: rgba(11, 15, 25, 0.82);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border-subtle);
+      padding: 0 24px;
+      height: 64px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+      color: var(--text-main);
+      font-weight: 700;
+      font-size: 1.15rem;
+    }
+
+    .brand-icon {
+      width: 34px;
+      height: 34px;
+      border-radius: 10px;
+      background: var(--accent-gradient);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 14px rgba(99, 102, 241, 0.35);
+    }
+    .brand-icon svg {
+      width: 18px;
+      height: 18px;
+      stroke: white;
+    }
+
+    .nav-tabs {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(255, 255, 255, 0.03);
+      padding: 4px;
+      border-radius: var(--radius-pill);
+      border: 1px solid var(--border-subtle);
+    }
+
+    .nav-tab-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      font-size: 0.85rem;
+      font-weight: 600;
+      padding: 7px 18px;
+      border-radius: var(--radius-pill);
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .nav-tab-btn.active {
+      background: var(--accent-gradient);
+      color: #fff;
+      box-shadow: 0 4px 14px rgba(99, 102, 241, 0.3);
+    }
+
+    .topbar-actions {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .icon-action-btn {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      position: relative;
+      transition: color 0.2s, background 0.2s;
+    }
+
+    .icon-action-btn:hover {
+      color: var(--text-main);
+      background: rgba(255, 255, 255, 0.08);
+    }
+
+    .notif-badge {
+      position: absolute;
+      top: 6px;
+      right: 6px;
+      width: 8px;
+      height: 8px;
+      background: #ef4444;
+      border-radius: 50%;
+      border: 2px solid #0b0f19;
+    }
+
+    .user-profile-badge {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 4px 12px 4px 4px;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-pill);
+      cursor: pointer;
+    }
+
+    .user-avatar-sm {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: var(--accent-gradient);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 0.8rem;
+      color: #fff;
+    }
+
+    .user-meta-name {
+      font-size: 0.82rem;
+      font-weight: 600;
+      line-height: 1.2;
+    }
+
+    .user-meta-role {
+      font-size: 0.7rem;
+      color: var(--text-dim);
+    }
+
+    .dashboard-layout {
+      position: relative;
+      z-index: 10;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      max-width: 1440px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 20px 24px 30px;
+      gap: 20px;
+    }
+
+    .view-container {
+      display: none;
+      opacity: 0;
+      transform: translateY(12px);
+    }
+
+    .view-container.active-view {
+      display: flex;
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    #chatView {
+      height: calc(100vh - 124px);
+      height: calc(100dvh - 124px);
+      min-height: 580px;
+      border-radius: var(--radius-lg);
+      background: var(--bg-panel);
+      backdrop-filter: blur(28px);
+      -webkit-backdrop-filter: blur(28px);
+      border: 1px solid var(--border-subtle);
+      overflow: hidden;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.45);
+    }
+
+    .chat-layout {
+      display: grid;
+      grid-template-columns: 260px 1fr 240px;
+      width: 100%;
+      height: 100%;
+    }
+
+    /* Left channel list */
+    .chat-channels-pane {
+      background: rgba(11, 17, 32, 0.7);
+      border-right: 1px solid var(--border-subtle);
+      display: flex;
+      flex-direction: column;
+      padding: 16px 12px;
+      overflow-y: auto;
+    }
+
+    .pane-header-label {
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-dim);
+      padding: 8px 10px 6px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .channels-list {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      margin-bottom: 20px;
+    }
+
+    .channel-pill {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 9px 12px;
+      border-radius: var(--radius-md);
+      font-size: 0.86rem;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: all 0.15s ease;
+      background: transparent;
+      border: none;
+      width: 100%;
+      text-align: left;
+    }
+
+    .channel-pill:hover {
+      background: rgba(255, 255, 255, 0.04);
+      color: var(--text-main);
+    }
+
+    .channel-pill.active {
+      background: rgba(99, 102, 241, 0.18);
+      color: #fff;
+      font-weight: 600;
+      border-left: 3px solid #6366f1;
+    }
+
+    .channel-name {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .channel-name svg {
+      width: 16px;
+      height: 16px;
+      opacity: 0.7;
+      flex-shrink: 0;
+    }
+
+    .unread-tag {
+      background: #6366f1;
+      color: #fff;
+      font-size: 0.68rem;
+      font-weight: 700;
+      padding: 1px 7px;
+      border-radius: var(--radius-pill);
+    }
+
+    /* Main central chat stream */
+    .chat-main-pane {
+      display: flex;
+      flex-direction: column;
+      background: rgba(8, 12, 22, 0.4);
+      position: relative;
+    }
+
+    .chat-header {
+      height: 60px;
+      padding: 0 20px;
+      border-bottom: 1px solid var(--border-subtle);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: rgba(15, 23, 42, 0.4);
+    }
+
+    .chat-header-info {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .chat-header-title {
+      font-size: 0.98rem;
+      font-weight: 700;
+    }
+
+    .chat-header-topic {
+      font-size: 0.78rem;
+      color: var(--text-dim);
+      border-left: 1px solid var(--border-subtle);
+      padding-left: 10px;
+      margin-left: 2px;
+    }
+
+    .chat-header-stats {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.78rem;
+      color: var(--emerald-accent);
+      background: rgba(16, 185, 129, 0.1);
+      padding: 4px 10px;
+      border-radius: var(--radius-pill);
+      border: 1px solid rgba(16, 185, 129, 0.2);
+    }
+
+    .dot-live {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--emerald-accent);
+      box-shadow: 0 0 6px var(--emerald-accent);
+    }
+
+    .chat-messages-viewport {
+      flex: 1;
+      overflow-y: auto;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .msg-group {
+      display: flex;
+      gap: 12px;
+      max-width: 82%;
+    }
+
+    .msg-group.self {
+      align-self: flex-end;
+      flex-direction: row-reverse;
+    }
+
+    .msg-avatar {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 0.82rem;
+      color: white;
+    }
+
+    .avatar-prof { background: linear-gradient(135deg, #ec4899, #8b5cf6); }
+    .avatar-stu1 { background: linear-gradient(135deg, #06b6d4, #3b82f6); }
+    .avatar-stu2 { background: linear-gradient(135deg, #10b981, #059669); }
+    .avatar-self { background: var(--accent-gradient); }
+
+    .msg-content {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .msg-group.self .msg-content {
+      align-items: flex-end;
+    }
+
+    .msg-meta {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.75rem;
+    }
+
+    .msg-author {
+      font-weight: 700;
+      color: var(--text-main);
+    }
+
+    .tag-badge {
+      font-size: 0.65rem;
+      font-weight: 700;
+      padding: 1px 6px;
+      border-radius: 4px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .tag-teacher {
+      background: rgba(139, 92, 246, 0.2);
+      color: #c084fc;
+      border: 1px solid rgba(139, 92, 246, 0.4);
+    }
+
+    .tag-student {
+      background: rgba(14, 165, 233, 0.15);
+      color: #38bdf8;
+      border: 1px solid rgba(14, 165, 233, 0.3);
+    }
+
+    .msg-time {
+      color: var(--text-dim);
+    }
+
+    .msg-bubble {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--border-subtle);
+      border-radius: 12px;
+      padding: 10px 14px;
+      font-size: 0.88rem;
+      line-height: 1.45;
+      color: #e2e8f0;
+      word-break: break-word;
+    }
+
+    .msg-group.self .msg-bubble {
+      background: #4f46e5;
+      border-color: #6366f1;
+      color: #ffffff;
+      border-bottom-right-radius: 2px;
+    }
+
+    .msg-group:not(.self) .msg-bubble {
+      border-bottom-left-radius: 2px;
+    }
+
+    .reaction-bar {
+      display: flex;
+      gap: 6px;
+      margin-top: 2px;
+    }
+
+    .reaction-chip {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--border-subtle);
+      padding: 2px 7px;
+      border-radius: var(--radius-pill);
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+
+    .reaction-chip:hover {
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    /* Chat input footer */
+    .chat-input-footer {
+      padding: 14px 18px;
+      background: rgba(11, 15, 25, 0.7);
+      border-top: 1px solid var(--border-subtle);
+    }
+
+    .input-box-wrapper {
+      background: rgba(18, 26, 44, 0.85);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      padding: 6px 10px 6px 14px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    .input-box-wrapper:focus-within {
+      border-color: var(--border-focus);
+      box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.15);
+    }
+
+    .chat-input {
+      flex: 1;
+      background: transparent;
+      border: none;
+      outline: none;
+      color: var(--text-main);
+      font-size: 0.9rem;
+    }
+
+    .chat-input::placeholder {
+      color: var(--text-dim);
+    }
+
+    .input-btn-group {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .icon-input-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      cursor: pointer;
+      padding: 6px;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: color 0.15s, background 0.15s;
+    }
+
+    .icon-input-btn:hover {
+      color: var(--text-main);
+      background: rgba(255, 255, 255, 0.06);
+    }
+
+    .send-msg-btn {
+      background: var(--accent-gradient);
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      padding: 8px 14px;
+      font-weight: 600;
+      font-size: 0.82rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: transform 0.15s ease, opacity 0.15s ease;
+    }
+
+    .send-msg-btn:hover {
+      transform: translateY(-1px);
+    }
+
+    /* Right channel roster / members pane */
+    .chat-members-pane {
+      background: rgba(11, 17, 32, 0.7);
+      border-left: 1px solid var(--border-subtle);
+      display: flex;
+      flex-direction: column;
+      padding: 16px 12px;
+      overflow-y: auto;
+    }
+
+    .member-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 7px 8px;
+      border-radius: var(--radius-md);
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+
+    .member-item:hover {
+      background: rgba(255, 255, 255, 0.04);
+    }
+
+    .member-avatar-wrap {
+      position: relative;
+    }
+
+    .member-avatar {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: #fff;
+    }
+
+    .status-dot-indicator {
+      position: absolute;
+      bottom: -1px;
+      right: -1px;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      border: 2px solid #07090e;
+    }
+
+    .status-dot-indicator.online { background: #10b981; }
+    .status-dot-indicator.idle { background: #f59e0b; }
+
+    .member-meta-name {
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--text-main);
+    }
+
+    .member-meta-role {
+      font-size: 0.7rem;
+      color: var(--text-dim);
+    }
+
+    .profiles-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 18px;
+      width: 100%;
+    }
+
+    .profile-card {
+      background: var(--bg-panel);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 16px;
+      transition: transform 0.2s ease, border-color 0.2s ease;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    }
+
+    .profile-card:hover {
+      transform: translateY(-4px);
+      border-color: rgba(99, 102, 241, 0.4);
+    }
+
+    .profile-top {
+      display: flex;
+      gap: 14px;
+    }
+
+    .profile-large-avatar {
+      width: 52px;
+      height: 52px;
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 1.15rem;
+      color: white;
+      flex-shrink: 0;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.3);
+    }
+
+    .profile-header-info {
+      flex: 1;
+    }
+
+    .profile-name-row {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 2px;
+    }
+
+    .profile-full-name {
+      font-size: 0.96rem;
+      font-weight: 700;
+    }
+
+    .verified-icon {
+      width: 16px;
+      height: 16px;
+      color: #38bdf8;
+      flex-shrink: 0;
+    }
+
+    .profile-subject {
+      font-size: 0.8rem;
+      color: #818cf8;
+      font-weight: 600;
+    }
+
+    .profile-spec-tag {
+      font-size: 0.74rem;
+      color: var(--text-dim);
+    }
+
+    .profile-stats-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      background: rgba(255, 255, 255, 0.03);
+      padding: 10px 14px;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border-subtle);
+    }
+
+    .stat-label {
+      font-size: 0.7rem;
+      color: var(--text-dim);
+    }
+
+    .stat-val {
+      font-size: 0.86rem;
+      font-weight: 700;
+      color: var(--text-main);
+    }
+
+    .profile-card-action {
+      display: flex;
+      gap: 8px;
+    }
+
+    .btn-card-primary {
+      flex: 1;
+      background: rgba(99, 102, 241, 0.15);
+      color: #a5b4fc;
+      border: 1px solid rgba(99, 102, 241, 0.35);
+      border-radius: var(--radius-pill);
+      padding: 8px 12px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      cursor: pointer;
+      text-align: center;
+      transition: all 0.2s ease;
+    }
+
+    .btn-card-primary:hover {
+      background: #6366f1;
+      color: #fff;
+    }
+
+    .btn-card-secondary {
+      background: rgba(255, 255, 255, 0.04);
+      color: var(--text-muted);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-pill);
+      padding: 8px 12px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+
+    .btn-card-secondary:hover {
+      background: rgba(255, 255, 255, 0.08);
+      color: var(--text-main);
+    }
+
+    /* Section titles */
+    .section-header-wrap {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+    }
+
+    .section-title {
+      font-size: 1.25rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+
+    .section-subtitle {
+      font-size: 0.82rem;
+      color: var(--text-muted);
+    }
+
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.7);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      z-index: 100;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
+
+    .modal-window {
+      background: #0d1322;
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      max-width: 520px;
+      width: 100%;
+      padding: 26px;
+      position: relative;
+      box-shadow: 0 24px 64px rgba(0, 0, 0, 0.6);
+      transform-origin: center;
+    }
+
+    .modal-close-btn {
+      position: absolute;
+      top: 18px;
+      right: 18px;
+      background: rgba(255, 255, 255, 0.06);
+      border: none;
+      color: var(--text-muted);
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: color 0.15s, background 0.15s;
+    }
+
+    .modal-close-btn:hover {
+      color: #fff;
+      background: rgba(255, 255, 255, 0.12);
+    }
+
+    .modal-profile-header {
+      display: flex;
+      gap: 16px;
+      align-items: center;
+      margin-bottom: 18px;
+    }
+
+    .modal-avatar {
+      width: 64px;
+      height: 64px;
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.4rem;
+      font-weight: 800;
+      color: #fff;
+    }
+
+    .modal-bio-box {
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      padding: 14px;
+      font-size: 0.86rem;
+      color: #cbd5e1;
+      line-height: 1.5;
+      margin-bottom: 18px;
+    }
+
+    .modal-detail-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-bottom: 20px;
+      font-size: 0.84rem;
+    }
+
+    .modal-detail-item {
+      display: flex;
+      justify-content: space-between;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+      padding-bottom: 8px;
+    }
+
+    .modal-detail-item .label {
+      color: var(--text-dim);
+    }
+
+    .modal-detail-item .val {
+      font-weight: 600;
+      color: var(--text-main);
+    }
+
+    /* Toast notification pop-up */
+    .toast-pill {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      z-index: 110;
+      background: rgba(15, 23, 42, 0.95);
+      border: 1px solid rgba(99, 102, 241, 0.4);
+      padding: 10px 18px;
+      border-radius: var(--radius-pill);
+      font-size: 0.84rem;
+      color: #fff;
+      display: none;
+      align-items: center;
+      gap: 8px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+    }
+
+    @media (max-width: 1024px) {
+      .chat-layout {
+        grid-template-columns: 220px 1fr;
+      }
+      .chat-members-pane {
+        display: none;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .topbar {
+        padding: 0 16px;
+      }
+      .nav-tabs {
+        display: none;
+      }
+      .dashboard-layout {
+        padding: 14px 14px 80px;
+      }
+      .chat-layout {
+        grid-template-columns: 1fr;
+      }
+      .chat-channels-pane {
+        display: none;
+      }
+      #chatView {
+        height: calc(100vh - 150px);
+        height: calc(100dvh - 150px);
+      }
+      /* Mobile bottom nav */
+      .mobile-bottom-bar {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: 60px;
+        background: rgba(11, 15, 25, 0.94);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+        border-top: 1px solid var(--border-subtle);
+        display: flex;
+        align-items: center;
+        justify-content: space-around;
+        z-index: 50;
+      }
+      .mobile-tab-btn {
+        background: none;
+        border: none;
+        color: var(--text-muted);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 3px;
+        font-size: 0.68rem;
+        cursor: pointer;
+      }
+      .mobile-tab-btn.active {
+        color: #818cf8;
+      }
+      .mobile-tab-btn svg {
+        width: 20px;
+        height: 20px;
+      }
+    }
+
+    @media (min-width: 769px) {
+      .mobile-bottom-bar {
+        display: none;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Ambient Glow Effects -->
+  <div class="ambient-canvas">
+    <div class="ambient-orb orb-1"></div>
+    <div class="ambient-orb orb-2"></div>
+  </div>
+  <div class="grid-lines"></div>
+
+  <header class="topbar">
+    <a href="#" class="brand">
+      <div class="brand-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M22 10v6M2 10l10-5 10 5-10 5z"/>
+          <path d="M6 12v5c3 3 9 3 12 0v-5"/>
+        </svg>
+      </div>
+      <span>EduConnect</span>
+    </a>
+
+    <!-- Navigation Switcher Tabs -->
+    <div class="nav-tabs" id="viewSwitcher">
+      <button class="nav-tab-btn active" data-target="chatView">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        Group Chats
+      </button>
+      <button class="nav-tab-btn" data-target="teachersView">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        Teachers Directory
+      </button>
+      <button class="nav-tab-btn" data-target="studentsView">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        Students Roster
+      </button>
+    </div>
+
+    <!-- Right Controls -->
+    <div class="topbar-actions">
+      <button class="icon-action-btn" aria-label="Notifications" onclick="triggerToast('You have 2 pending assignment notifications')">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+        <span class="notif-badge"></span>
+      </button>
+
+      <div class="user-profile-badge" onclick="openCurrentUserModal()">
+        <div class="user-avatar-sm">AJ</div>
+        <div style="display: flex; flex-direction: column;">
+          <span class="user-meta-name">Alex Johnson</span>
+          <span class="user-meta-role">Computer Science '27</span>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="dashboard-layout">
+
+    <!-- VIEW 1: BIG INTERACTIVE GROUP CHAT CONTAINER -->
+    <section id="chatView" class="view-container active-view">
+      <div class="chat-layout">
+        
+        <!-- Channels Pane (Left) -->
+        <aside class="chat-channels-pane">
+          <div class="pane-header-label">
+            <span>Course Channels</span>
+            <span style="font-size: 0.68rem; color: #818cf8;">5 active</span>
+          </div>
+
+          <div class="channels-list">
+            <button class="channel-pill active" data-channel="calc" data-topic="Limits, Derivatives & Optimization">
+              <div class="channel-name">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="4" y1="9" x2="20" y2="9"/><line x1="4" y1="15" x2="20" y2="15"/><line x1="10" y1="3" x2="8" y2="21"/><line x1="16" y1="3" x2="14" y2="21"/></svg>
+                <span>adv-calculus-ii</span>
+              </div>
+              <span class="unread-tag">3</span>
+            </button>
+
+            <button class="channel-pill" data-channel="ai" data-topic="Reinforcement Learning & PyTorch Project 2">
+              <div class="channel-name">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="4" y1="9" x2="20" y2="9"/><line x1="4" y1="15" x2="20" y2="15"/><line x1="10" y1="3" x2="8" y2="21"/><line x1="16" y1="3" x2="14" y2="21"/></svg>
+                <span>ai-robotics-lab</span>
+              </div>
+            </button>
+
+            <button class="channel-pill" data-channel="physics" data-topic="Quantum Optics and Wave Mechanics">
+              <div class="channel-name">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="4" y1="9" x2="20" y2="9"/><line x1="4" y1="15" x2="20" y2="15"/><line x1="10" y1="3" x2="8" y2="21"/><line x1="16" y1="3" x2="14" y2="21"/></svg>
+                <span>physics-101</span>
+              </div>
+              <span class="unread-tag">1</span>
+            </button>
+          </div>
+
+          <div class="pane-header-label">
+            <span>Community Lounges</span>
+          </div>
+
+          <div class="channels-list">
+            <button class="channel-pill" data-channel="lounge" data-topic="Casual study sessions, coffee breaks & banter">
+              <div class="channel-name">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="4" y1="9" x2="20" y2="9"/><line x1="4" y1="15" x2="20" y2="15"/><line x1="10" y1="3" x2="8" y2="21"/><line x1="16" y1="3" x2="14" y2="21"/></svg>
+                <span>peer-lounge</span>
+              </div>
+            </button>
+
+            <button class="channel-pill" data-channel="office-hours" data-topic="Live Q&A with Professors & Teaching Assistants">
+              <div class="channel-name">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="4" y1="9" x2="20" y2="9"/><line x1="4" y1="15" x2="20" y2="15"/><line x1="10" y1="3" x2="8" y2="21"/><line x1="16" y1="3" x2="14" y2="21"/></svg>
+                <span>office-hours</span>
+              </div>
+            </button>
+          </div>
+        </aside>
+
+        <div class="chat-main-pane">
+          <!-- Channel Title Header -->
+          <div class="chat-header">
+            <div class="chat-header-info">
+              <span class="chat-header-title" id="activeChannelHeader">#adv-calculus-ii</span>
+              <span class="chat-header-topic" id="activeChannelTopic">Limits, Derivatives & Optimization</span>
+            </div>
+            <div class="chat-header-stats">
+              <span class="dot-live"></span>
+              <span>24 online</span>
+            </div>
+          </div>
+
+          <!-- Messages Stream Viewport -->
+          <div class="chat-messages-viewport" id="messagesViewport">
+            <!-- Message 1 (Teacher) -->
+            <div class="msg-group">
+              <div class="msg-avatar avatar-prof">DK</div>
+              <div class="msg-content">
+                <div class="msg-meta">
+                  <span class="msg-author">Dr. Douglas Kim</span>
+                  <span class="tag-badge tag-teacher">Teacher</span>
+                  <span class="msg-time">10:42 AM</span>
+                </div>
+                <div class="msg-bubble">
+                  Morning everyone! I have updated the study guide for tomorrow's multivariable test. Please check Theorem 4.2 in the repository.
+                </div>
+                <div class="reaction-bar">
+                  <span class="reaction-chip">👍 6</span>
+                  <span class="reaction-chip">🙌 4</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Message 2 (Student) -->
+            <div class="msg-group">
+              <div class="msg-avatar avatar-stu1">SR</div>
+              <div class="msg-content">
+                <div class="msg-meta">
+                  <span class="msg-author">Sarah Rodriguez</span>
+                  <span class="tag-badge tag-student">Student</span>
+                  <span class="msg-time">10:45 AM</span>
+                </div>
+                <div class="msg-bubble">
+                  Thank you Dr. Kim! Quick question: will the proof for Green's Theorem be required or just practical calculations?
+                </div>
+              </div>
+            </div>
+
+            <!-- Message 3 (Teacher Answer) -->
+            <div class="msg-group">
+              <div class="msg-avatar avatar-prof">DK</div>
+              <div class="msg-content">
+                <div class="msg-meta">
+                  <span class="msg-author">Dr. Douglas Kim</span>
+                  <span class="tag-badge tag-teacher">Teacher</span>
+                  <span class="msg-time">10:47 AM</span>
+                </div>
+                <div class="msg-bubble">
+                  Focus primarily on application and surface integrals. You don't need to write the 3-page rigorous lemma from scratch!
+                </div>
+                <div class="reaction-bar">
+                  <span class="reaction-chip">🎉 8</span>
+                  <span class="reaction-chip">💡 3</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Message 4 (Logged-in Student Self) -->
+            <div class="msg-group self">
+              <div class="msg-avatar avatar-self">AJ</div>
+              <div class="msg-content">
+                <div class="msg-meta">
+                  <span class="msg-time">10:50 AM</span>
+                  <span class="tag-badge tag-student">You</span>
+                  <span class="msg-author">Alex Johnson</span>
+                </div>
+                <div class="msg-bubble">
+                  Awesome, that relieves a ton of pressure! I'll be in the study room at 4 PM if anyone wants to solve practice sheet 6 together.
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Chat Input Area -->
+          <footer class="chat-input-footer">
+            <form id="chatForm" onsubmit="handleSendMessage(event)">
+              <div class="input-box-wrapper">
+                <button type="button" class="icon-input-btn" title="Attach file or code snippet" onclick="triggerToast('Attachment upload opened')">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>
+                </button>
+                <input type="text" id="chatInputField" class="chat-input" placeholder="Message #adv-calculus-ii or ask a teacher..." autocomplete="off">
+                <div class="input-btn-group">
+                  <button type="button" class="icon-input-btn" title="Add emoji" onclick="appendQuickEmoji()">😊</button>
+                  <button type="submit" class="send-msg-btn">
+                    <span>Send</span>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+                  </button>
+                </div>
+              </div>
+            </form>
+          </footer>
+        </div>
+
+        <aside class="chat-members-pane">
+          <div class="pane-header-label">
+            <span>Faculty in Room</span>
+          </div>
+          <div class="member-item" onclick="openProfile('dk')">
+            <div class="member-avatar-wrap">
+              <div class="member-avatar avatar-prof">DK</div>
+              <span class="status-dot-indicator online"></span>
+            </div>
+            <div>
+              <div class="member-meta-name">Dr. Douglas Kim</div>
+              <div class="member-meta-role">Math Faculty</div>
+            </div>
+          </div>
+
+          <div class="pane-header-label" style="margin-top: 14px;">
+            <span>Students (3 Online)</span>
+          </div>
+
+          <div class="member-item" onclick="openProfile('sr')">
+            <div class="member-avatar-wrap">
+              <div class="member-avatar avatar-stu1">SR</div>
+              <span class="status-dot-indicator online"></span>
+            </div>
+            <div>
+              <div class="member-meta-name">Sarah Rodriguez</div>
+              <div class="member-meta-role">Data Science '26</div>
+            </div>
+          </div>
+
+          <div class="member-item" onclick="openProfile('mc')">
+            <div class="member-avatar-wrap">
+              <div class="member-avatar avatar-stu2">MC</div>
+              <span class="status-dot-indicator idle"></span>
+            </div>
+            <div>
+              <div class="member-meta-name">Marcus Chen</div>
+              <div class="member-meta-role">Physics '27</div>
+            </div>
+          </div>
+
+          <div class="member-item" onclick="openProfile('aj')">
+            <div class="member-avatar-wrap">
+              <div class="member-avatar avatar-self">AJ</div>
+              <span class="status-dot-indicator online"></span>
+            </div>
+            <div>
+              <div class="member-meta-name">Alex Johnson (You)</div>
+              <div class="member-meta-role">CS '27</div>
+            </div>
+          </div>
+        </aside>
+
+      </div>
+    </section>
+
+    <section id="teachersView" class="view-container">
+      <div style="width: 100%;">
+        <div class="section-header-wrap">
+          <div>
+            <h2 class="section-title">Faculty & Mentors</h2>
+            <p class="section-subtitle">Connect with verified course instructors and book 1-on-1 office consultations.</p>
+          </div>
+        </div>
+
+        <div class="profiles-grid" id="teachersGrid">
+          <!-- Teacher Card 1 -->
+          <div class="profile-card">
+            <div class="profile-top">
+              <div class="profile-large-avatar" style="background: linear-gradient(135deg, #ec4899, #8b5cf6);">DK</div>
+              <div class="profile-header-info">
+                <div class="profile-name-row">
+                  <span class="profile-full-name">Dr. Douglas Kim</span>
+                  <svg class="verified-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+                </div>
+                <div class="profile-subject">Pure & Applied Mathematics</div>
+                <div class="profile-spec-tag">14 Years Experience • MIT Alumni</div>
+              </div>
+            </div>
+
+            <div class="profile-stats-row">
+              <div>
+                <div class="stat-label">Rating</div>
+                <div class="stat-val">★ 4.96 / 5.0</div>
+              </div>
+              <div>
+                <div class="stat-label">Office Hours</div>
+                <div class="stat-val">Mon, Wed 2-4 PM</div>
+              </div>
+            </div>
+
+            <div class="profile-card-action">
+              <button class="btn-card-primary" onclick="openProfile('dk')">View Full Profile</button>
+              <button class="btn-card-secondary" onclick="switchChannelDirect('calc')">Group Chat</button>
+            </div>
+          </div>
+
+          <!-- Teacher Card 2 -->
+          <div class="profile-card">
+            <div class="profile-top">
+              <div class="profile-large-avatar" style="background: linear-gradient(135deg, #3b82f6, #06b6d4);">EC</div>
+              <div class="profile-header-info">
+                <div class="profile-name-row">
+                  <span class="profile-full-name">Dr. Elena Chen</span>
+                  <svg class="verified-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+                </div>
+                <div class="profile-subject">Artificial Intelligence & Robotics</div>
+                <div class="profile-spec-tag">Former Senior Researcher @ DeepMind</div>
+              </div>
+            </div>
+
+            <div class="profile-stats-row">
+              <div>
+                <div class="stat-label">Rating</div>
+                <div class="stat-val">★ 4.98 / 5.0</div>
+              </div>
+              <div>
+                <div class="stat-label">Office Hours</div>
+                <div class="stat-val">Tue, Thu 3-5 PM</div>
+              </div>
+            </div>
+
+            <div class="profile-card-action">
+              <button class="btn-card-primary" onclick="openProfile('ec')">View Full Profile</button>
+              <button class="btn-card-secondary" onclick="switchChannelDirect('ai')">Group Chat</button>
+            </div>
+          </div>
+
+          <!-- Teacher Card 3 -->
+          <div class="profile-card">
+            <div class="profile-top">
+              <div class="profile-large-avatar" style="background: linear-gradient(135deg, #10b981, #06b6d4);">AR</div>
+              <div class="profile-header-info">
+                <div class="profile-name-row">
+                  <span class="profile-full-name">Prof. Alan Reynolds</span>
+                  <svg class="verified-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+                </div>
+                <div class="profile-subject">Theoretical & Quantum Physics</div>
+                <div class="profile-spec-tag">Author of Modern Particle Systems</div>
+              </div>
+            </div>
+
+            <div class="profile-stats-row">
+              <div>
+                <div class="stat-label">Rating</div>
+                <div class="stat-val">★ 4.88 / 5.0</div>
+              </div>
+              <div>
+                <div class="stat-label">Office Hours</div>
+                <div class="stat-val">Fri 1-3 PM</div>
+              </div>
+            </div>
+
+            <div class="profile-card-action">
+              <button class="btn-card-primary" onclick="openProfile('ar')">View Full Profile</button>
+              <button class="btn-card-secondary" onclick="switchChannelDirect('physics')">Group Chat</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="studentsView" class="view-container">
+      <div style="width: 100%;">
+        <div class="section-header-wrap">
+          <div>
+            <h2 class="section-title">Student Cohort</h2>
+            <p class="section-subtitle">Collaborate with peers, form study groups, and review peer project showcases.</p>
+          </div>
+        </div>
+
+        <div class="profiles-grid" id="studentsGrid">
+          <!-- Student Card 1 -->
+          <div class="profile-card">
+            <div class="profile-top">
+              <div class="profile-large-avatar" style="background: linear-gradient(135deg, #06b6d4, #3b82f6);">SR</div>
+              <div class="profile-header-info">
+                <div class="profile-name-row">
+                  <span class="profile-full-name">Sarah Rodriguez</span>
+                </div>
+                <div class="profile-subject">Data Science • Year 3</div>
+                <div class="profile-spec-tag">Focus: High-Throughput Analytics</div>
+              </div>
+            </div>
+
+            <div class="profile-stats-row">
+              <div>
+                <div class="stat-label">Study Streak</div>
+                <div class="stat-val">🔥 24 Days</div>
+              </div>
+              <div>
+                <div class="stat-label">Assignments</div>
+                <div class="stat-val">42 / 44 Done</div>
+              </div>
+            </div>
+
+            <div class="profile-card-action">
+              <button class="btn-card-primary" onclick="openProfile('sr')">View Profile</button>
+              <button class="btn-card-secondary" onclick="triggerToast('Study invite sent to Sarah')">Invite to Study</button>
+            </div>
+          </div>
+
+          <!-- Student Card 2 -->
+          <div class="profile-card">
+            <div class="profile-top">
+              <div class="profile-large-avatar" style="background: linear-gradient(135deg, #10b981, #059669);">MC</div>
+              <div class="profile-header-info">
+                <div class="profile-name-row">
+                  <span class="profile-full-name">Marcus Chen</span>
+                </div>
+                <div class="profile-subject">Physics & Computing • Year 2</div>
+                <div class="profile-spec-tag">Focus: Quantum Algorithms</div>
+              </div>
+            </div>
+
+            <div class="profile-stats-row">
+              <div>
+                <div class="stat-label">Study Streak</div>
+                <div class="stat-val">🔥 18 Days</div>
+              </div>
+              <div>
+                <div class="stat-label">Assignments</div>
+                <div class="stat-val">38 / 40 Done</div>
+              </div>
+            </div>
+
+            <div class="profile-card-action">
+              <button class="btn-card-primary" onclick="openProfile('mc')">View Profile</button>
+              <button class="btn-card-secondary" onclick="triggerToast('Study invite sent to Marcus')">Invite to Study</button>
+            </div>
+          </div>
+
+          <!-- Student Card 3 (You) -->
+          <div class="profile-card">
+            <div class="profile-top">
+              <div class="profile-large-avatar" style="background: var(--accent-gradient);">AJ</div>
+              <div class="profile-header-info">
+                <div class="profile-name-row">
+                  <span class="profile-full-name">Alex Johnson (You)</span>
+                </div>
+                <div class="profile-subject">Computer Science • Year 2</div>
+                <div class="profile-spec-tag">Focus: Distributed Cloud Systems</div>
+              </div>
+            </div>
+
+            <div class="profile-stats-row">
+              <div>
+                <div class="stat-label">Study Streak</div>
+                <div class="stat-val">🔥 31 Days</div>
+              </div>
+              <div>
+                <div class="stat-label">Assignments</div>
+                <div class="stat-val">46 / 48 Done</div>
+              </div>
+            </div>
+
+            <div class="profile-card-action">
+              <button class="btn-card-primary" onclick="openCurrentUserModal()">Edit My Profile</button>
+              <button class="btn-card-secondary" onclick="triggerToast('Your streak is synchronized!')">Share Streak</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <div class="mobile-bottom-bar">
+    <button class="mobile-tab-btn active" data-target="chatView">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+      <span>Chat</span>
+    </button>
+    <button class="mobile-tab-btn" data-target="teachersView">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      <span>Teachers</span>
+    </button>
+    <button class="mobile-tab-btn" data-target="studentsView">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+      <span>Students</span>
+    </button>
+  </div>
+
+  <div class="modal-backdrop" id="profileModalBackdrop" onclick="handleBackdropClick(event)">
+    <div class="modal-window" id="profileModalWindow">
+      <button class="modal-close-btn" onclick="closeProfileModal()" aria-label="Close modal">✕</button>
+      
+      <div class="modal-profile-header">
+        <div class="modal-avatar" id="mAvatar">DK</div>
+        <div>
+          <div style="display: flex; align-items: center; gap: 6px;">
+            <h3 style="font-size: 1.15rem; font-weight: 700;" id="mName">Dr. Douglas Kim</h3>
+            <svg id="mVerified" class="verified-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+          </div>
+          <p style="font-size: 0.82rem; color: #818cf8; font-weight: 600;" id="mRole">Professor of Applied Mathematics</p>
+        </div>
+      </div>
+
+      <div class="modal-bio-box" id="mBio">
+        Dedicated to making complex mathematical concepts intuitive and applicable to real-world software & engineering systems.
+      </div>
+
+      <div class="modal-detail-list">
+        <div class="modal-detail-item">
+          <span class="label" id="mDetail1Label">Email Address</span>
+          <span class="val" id="mDetail1Val">douglas.kim@educonnect.edu</span>
+        </div>
+        <div class="modal-detail-item">
+          <span class="label" id="mDetail2Label">Office Hours</span>
+          <span class="val" id="mDetail2Val">Mon & Wed, 2:00 PM - 4:00 PM (Room 408)</span>
+        </div>
+        <div class="modal-detail-item">
+          <span class="label" id="mDetail3Label">Primary Channel</span>
+          <span class="val" id="mDetail3Val">#adv-calculus-ii</span>
+        </div>
+      </div>
+
+      <div style="display: flex; gap: 10px;">
+        <button class="btn-card-primary" style="padding: 10px;" onclick="modalPrimaryAction()">Send Direct Message</button>
+        <button class="btn-card-secondary" style="padding: 10px;" onclick="closeProfileModal()">Done</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Global Action Toast -->
+  <div class="toast-pill" id="globalToast">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#34d399" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg>
+    <span id="toastMessage">Notification</span>
+  </div>
+
+  <script>
+    // Profile database for interactive modal
+    const profileDatabase = {
+      dk: {
+        name: "Dr. Douglas Kim",
+        initials: "DK",
+        avatarBg: "linear-gradient(135deg, #ec4899, #8b5cf6)",
+        role: "Professor of Pure & Applied Mathematics",
+        isTeacher: true,
+        bio: "Specializing in vector calculus, differential equations, and mathematical physics. Leading research on computational geometry and numerical simulation algorithms.",
+        email: "d.kim@educonnect.edu",
+        schedule: "Mon & Wed, 2:00 - 4:00 PM (Hall B)",
+        channel: "#adv-calculus-ii"
+      },
+      ec: {
+        name: "Dr. Elena Chen",
+        initials: "EC",
+        avatarBg: "linear-gradient(135deg, #3b82f6, #06b6d4)",
+        role: "Associate Professor of AI & Deep Learning",
+        isTeacher: true,
+        bio: "Focusing on large-scale foundational models, reinforcement learning with human feedback, and automated robotics systems. Former DeepMind researcher.",
+        email: "elena.chen@educonnect.edu",
+        schedule: "Tue & Thu, 3:00 - 5:00 PM (Lab 3)",
+        channel: "#ai-robotics-lab"
+      },
+      ar: {
+        name: "Prof. Alan Reynolds",
+        initials: "AR",
+        avatarBg: "linear-gradient(135deg, #10b981, #06b6d4)",
+        role: "Chair of Theoretical Physics",
+        isTeacher: true,
+        bio: "Author of modern physics textbooks on quantum electrodynamics and thermodynamics. Passionate about interactive simulations for complex physics concepts.",
+        email: "a.reynolds@educonnect.edu",
+        schedule: "Fridays 1:00 - 3:00 PM (Science Ctr)",
+        channel: "#physics-101"
+      },
+      sr: {
+        name: "Sarah Rodriguez",
+        initials: "SR",
+        avatarBg: "linear-gradient(135deg, #06b6d4, #3b82f6)",
+        role: "Undergraduate Student • Data Science '26",
+        isTeacher: false,
+        bio: "Passionate about predictive modeling, pandas/numpy pipelines, and database optimization. Organizing weekly group study drills for midterm exams.",
+        email: "s.rodriguez@student.educonnect.edu",
+        schedule: "Study Streak: 24 Days • GPA: 3.92",
+        channel: "#adv-calculus-ii"
+      },
+      mc: {
+        name: "Marcus Chen",
+        initials: "MC",
+        avatarBg: "linear-gradient(135deg, #10b981, #059669)",
+        role: "Undergraduate Student • Physics & CS '27",
+        isTeacher: false,
+        bio: "Working on quantum circuit simulators using Python and WebAssembly. Always down for collaborative problem sets in linear algebra and thermodynamics.",
+        email: "m.chen@student.educonnect.edu",
+        schedule: "Study Streak: 18 Days • Lab Assistant",
+        channel: "#physics-101"
+      },
+      aj: {
+        name: "Alex Johnson",
+        initials: "AJ",
+        avatarBg: "linear-gradient(135deg, #6366f1, #8b5cf6, #06b6d4)",
+        role: "Undergraduate Student • Computer Science '27",
+        isTeacher: false,
+        bio: "Building EduConnect components! Interested in high-performance frontend interfaces, distributed databases, and collaborative developer tooling.",
+        email: "alex.johnson@student.educonnect.edu",
+        schedule: "Study Streak: 31 Days • Enrolled in 4 Courses",
+        channel: "All channels active"
+      }
+    };
+
+    const tabButtons = document.querySelectorAll('.nav-tab-btn, .mobile-tab-btn');
+    const viewContainers = document.querySelectorAll('.view-container');
+
+    tabButtons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const targetId = btn.getAttribute('data-target');
+        if (!targetId) return;
+
+        tabButtons.forEach(b => {
+          if (b.getAttribute('data-target') === targetId) {
+            b.classList.add('active');
+          } else {
+            b.classList.remove('active');
+          }
+        });
+
+        viewContainers.forEach(view => {
+          if (view.id === targetId) {
+            view.classList.add('active-view');
+            gsap.fromTo(view, 
+              { opacity: 0, y: 15 },
+              { opacity: 1, y: 0, duration: 0.35, ease: 'power2.out' }
+            );
+          } else {
+            view.classList.remove('active-view');
+          }
+        });
+      });
+    });
+
+    const channelButtons = document.querySelectorAll('.channel-pill');
+    const activeChannelHeader = document.getElementById('activeChannelHeader');
+    const activeChannelTopic = document.getElementById('activeChannelTopic');
+    const chatInputField = document.getElementById('chatInputField');
+
+    channelButtons.forEach(pill => {
+      pill.addEventListener('click', () => {
+        channelButtons.forEach(p => p.classList.remove('active'));
+        pill.classList.add('active');
+
+        const channelKey = pill.getAttribute('data-channel');
+        const channelTopic = pill.getAttribute('data-topic');
+        const channelName = pill.querySelector('.channel-name span').textContent;
+
+        activeChannelHeader.textContent = '#' + channelName;
+        activeChannelTopic.textContent = channelTopic;
+        chatInputField.placeholder = `Message #${channelName}...`;
+
+        // Micro animation on channel switch
+        gsap.fromTo('#messagesViewport', 
+          { opacity: 0.6, y: 8 }, 
+          { opacity: 1, y: 0, duration: 0.25, ease: 'power1.out' }
+        );
+      });
+    });
+
+    function switchChannelDirect(channelCode) {
+      // Find the pill and trigger click
+      const pill = document.querySelector(`.channel-pill[data-channel="${channelCode}"]`);
+      if (pill) {
+        pill.click();
+        // Switch view back to chat
+        const chatNavBtn = document.querySelector('.nav-tab-btn[data-target="chatView"]');
+        if (chatNavBtn) chatNavBtn.click();
+      }
+    }
+
+    const messagesViewport = document.getElementById('messagesViewport');
+    const chatForm = document.getElementById('chatForm');
+
+    function handleSendMessage(event) {
+      event.preventDefault();
+      const text = chatInputField.value.trim();
+      if (!text) return;
+
+      const currentTime = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+      // Create outgoing message element
+      const msgDiv = document.createElement('div');
+      msgDiv.className = 'msg-group self';
+      msgDiv.innerHTML = `
+        <div class="msg-avatar avatar-self">AJ</div>
+        <div class="msg-content">
+          <div class="msg-meta">
+            <span class="msg-time">${currentTime}</span>
+            <span class="tag-badge tag-student">You</span>
+            <span class="msg-author">Alex Johnson</span>
+          </div>
+          <div class="msg-bubble">${escapeHtml(text)}</div>
+        </div>
+      `;
+
+      messagesViewport.appendChild(msgDiv);
+      chatInputField.value = '';
+      messagesViewport.scrollTop = messagesViewport.scrollHeight;
+
+      // Animate entry with GSAP
+      gsap.from(msgDiv, {
+        opacity: 0,
+        y: 12,
+        scale: 0.96,
+        duration: 0.3,
+        ease: 'power2.out'
+      });
+
+      // Automated helpful simulation reply after 1.4s
+      setTimeout(() => {
+        simulateTeacherResponse(text);
+      }, 1400);
+    }
+
+    function simulateTeacherResponse(userQuery) {
+      const currentTime = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      const teacherReply = document.createElement('div');
+      teacherReply.className = 'msg-group';
+
+      let replyMsg = "Great observation! I'll cover this specific problem at the start of our next discussion.";
+      if (userQuery.includes('?')) {
+        replyMsg = "Good question! Refer to slide 14 of the lecture notes or stop by office hours tomorrow.";
+      }
+
+      teacherReply.innerHTML = `
+        <div class="msg-avatar avatar-prof">DK</div>
+        <div class="msg-content">
+          <div class="msg-meta">
+            <span class="msg-author">Dr. Douglas Kim</span>
+            <span class="tag-badge tag-teacher">Teacher</span>
+            <span class="msg-time">${currentTime}</span>
+          </div>
+          <div class="msg-bubble">${replyMsg}</div>
+          <div class="reaction-bar">
+            <span class="reaction-chip">💡 1</span>
+          </div>
+        </div>
+      `;
+
+      messagesViewport.appendChild(teacherReply);
+      messagesViewport.scrollTop = messagesViewport.scrollHeight;
+
+      gsap.from(teacherReply, {
+        opacity: 0,
+        y: 12,
+        scale: 0.96,
+        duration: 0.3,
+        ease: 'power2.out'
+      });
+    }
+
+    function appendQuickEmoji() {
+      chatInputField.value += ' 🙌 ';
+      chatInputField.focus();
+    }
+
+    function escapeHtml(str) {
+      return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+
+    const modalBackdrop = document.getElementById('profileModalBackdrop');
+    const modalWindow = document.getElementById('profileModalWindow');
+
+    function openProfile(profileId) {
+      const data = profileDatabase[profileId];
+      if (!data) return;
+
+      document.getElementById('mAvatar').textContent = data.initials;
+      document.getElementById('mAvatar').style.background = data.avatarBg;
+      document.getElementById('mName').textContent = data.name;
+      document.getElementById('mRole').textContent = data.role;
+      document.getElementById('mBio').textContent = data.bio;
+      document.getElementById('mDetail1Val').textContent = data.email;
+      document.getElementById('mDetail2Val').textContent = data.schedule;
+      document.getElementById('mDetail3Val').textContent = data.channel;
+
+      const verifiedBadge = document.getElementById('mVerified');
+      verifiedBadge.style.display = data.isTeacher ? 'block' : 'none';
+
+      modalBackdrop.style.display = 'flex';
+      gsap.fromTo(modalBackdrop, { opacity: 0 }, { opacity: 1, duration: 0.2 });
+      gsap.fromTo(modalWindow, 
+        { scale: 0.92, opacity: 0, y: 15 }, 
+        { scale: 1, opacity: 1, y: 0, duration: 0.28, ease: 'back.out(1.5)' }
+      );
+    }
+
+    function openCurrentUserModal() {
+      openProfile('aj');
+    }
+
+    function closeProfileModal() {
+      gsap.to(modalWindow, {
+        scale: 0.94,
+        opacity: 0,
+        duration: 0.18,
+        ease: 'power2.in'
+      });
+      gsap.to(modalBackdrop, {
+        opacity: 0,
+        duration: 0.2,
+        onComplete: () => {
+          modalBackdrop.style.display = 'none';
+        }
+      });
+    }
+
+    function handleBackdropClick(e) {
+      if (e.target === modalBackdrop) {
+        closeProfileModal();
+      }
+    }
+
+    function modalPrimaryAction() {
+      closeProfileModal();
+      switchChannelDirect('calc');
+      triggerToast('Chat opened with contact');
+    }
+
+    // Toast Notification helper
+    let toastTimeout;
+    function triggerToast(msg) {
+      const toast = document.getElementById('globalToast');
+      const text = document.getElementById('toastMessage');
+      text.textContent = msg;
+
+      toast.style.display = 'flex';
+      gsap.fromTo(toast, 
+        { y: 20, opacity: 0 }, 
+        { y: 0, opacity: 1, duration: 0.25, ease: 'power2.out' }
+      );
+
+      clearTimeout(toastTimeout);
+      toastTimeout = setTimeout(() => {
+        gsap.to(toast, {
+          y: 20,
+          opacity: 0,
+          duration: 0.2,
+          onComplete: () => {
+            toast.style.display = 'none';
+          }
+        });
+      }, 3000);
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      // Entrance choreography
+      const tl = gsap.timeline({ defaults: { ease: 'power3.out' } });
+
+      tl.from('.topbar', {
+        y: -40,
+        opacity: 0,
+        duration: 0.65
+      })
+      .from('#chatView', {
+        scale: 0.98,
+        opacity: 0,
+        y: 20,
+        duration: 0.7
+      }, "-=0.35")
+      .from('.channel-pill', {
+        x: -15,
+        opacity: 0,
+        stagger: 0.05,
+        duration: 0.4
+      }, "-=0.4")
+      .from('.msg-group', {
+        y: 15,
+        opacity: 0,
+        stagger: 0.08,
+        duration: 0.45
+      }, "-=0.3");
+    });
+  </script>
+</body>
+</html>
