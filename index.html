@@ -1,934 +1,1724 @@
 <!DOCTYPE html>
-<html lang="en">
-
+<html lang="en" class="dark">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport"
-        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>EduConnect • Empowering Minds, Connecting Futures</title>
-
-    <!-- Google Fonts: Plus Jakarta Sans -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap"
-        rel="stylesheet">
-
-    <!-- GSAP Animation Library -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
-
-    <style>
-        :root {
-            --bg-dark: #07090e;
-            --bg-surface: rgba(15, 23, 42, 0.65);
-            --surface-border: rgba(255, 255, 255, 0.08);
-            --accent-gradient: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #06b6d4 100%);
-            --accent-glow: rgba(99, 102, 241, 0.25);
-            --text-main: #f8fafc;
-            --text-muted: #94a3b8;
-            --text-dim: #64748b;
-            --radius-pill: 9999px;
-            --radius-xl: 20px;
-            --radius-lg: 14px;
-            --radius-md: 10px;
-        }
-
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
-            -webkit-font-smoothing: antialiased;
-            -webkit-tap-highlight-color: transparent;
-        }
-
-        body {
-            background-color: var(--bg-dark);
-            color: var(--text-main);
-            min-height: 100vh;
-            min-height: 100dvh;
-            overflow-x: hidden;
-            position: relative;
-        }
-
-        .ambient-canvas {
-            position: fixed;
-            inset: 0;
-            pointer-events: none;
-            z-index: 0;
-            overflow: hidden;
-        }
-
-        .ambient-orb {
-            position: absolute;
-            border-radius: 50%;
-            filter: blur(100px);
-            opacity: 0.35;
-            will-change: transform;
-        }
-
-        .orb-purple {
-            width: min(500px, 90vw);
-            height: min(500px, 90vw);
-            background: radial-gradient(circle, #6366f1 0%, transparent 70%);
-            top: -100px;
-            left: 10%;
-        }
-
-        .orb-cyan {
-            width: min(450px, 85vw);
-            height: min(450px, 85vw);
-            background: radial-gradient(circle, #06b6d4 0%, transparent 70%);
-            bottom: 5%;
-            right: 5%;
-        }
-
-        .grid-lines {
-            position: fixed;
-            inset: 0;
-            background-image:
-                linear-gradient(to right, rgba(255, 255, 255, 0.02) 1px, transparent 1px),
-                linear-gradient(to bottom, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
-            background-size: 40px 40px;
-            z-index: 1;
-            pointer-events: none;
-        }
-
-        .nav-wrapper {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            z-index: 100;
-            padding: 16px 24px;
-            display: flex;
-            justify-content: center;
-        }
-
-        .navbar {
-            width: 100%;
-            max-width: 1180px;
-            height: 64px;
-            background: rgba(11, 15, 25, 0.75);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border: 1px solid var(--surface-border);
-            border-radius: var(--radius-pill);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 0 24px;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35);
-        }
-
-        .brand {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            text-decoration: none;
-            color: var(--text-main);
-            font-weight: 700;
-            font-size: 1.18rem;
-            letter-spacing: -0.02em;
-        }
-
-        .brand-icon {
-            width: 34px;
-            height: 34px;
-            border-radius: 10px;
-            background: var(--accent-gradient);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 4px 14px var(--accent-glow);
-        }
-
-        .brand-icon svg {
-            width: 18px;
-            height: 18px;
-            stroke: white;
-        }
-
-        .nav-links {
-            display: flex;
-            align-items: center;
-            gap: 32px;
-            list-style: none;
-        }
-
-        .nav-link {
-            color: var(--text-muted);
-            text-decoration: none;
-            font-size: 0.92rem;
-            font-weight: 500;
-            transition: color 0.2s ease;
-            position: relative;
-        }
-
-        .nav-link:hover {
-            color: var(--text-main);
-        }
-
-        .nav-actions {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .btn-nav-primary {
-            background: var(--accent-gradient);
-            color: white;
-            border: none;
-            padding: 9px 20px;
-            border-radius: var(--radius-pill);
-            font-size: 0.88rem;
-            font-weight: 600;
-            cursor: pointer;
-            text-decoration: none;
-            box-shadow: 0 4px 16px var(--accent-glow);
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
-        }
-
-        .btn-nav-primary:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 6px 22px rgba(99, 102, 241, 0.4);
-        }
-
-        .btn-menu-toggle {
-            display: none;
-            background: none;
-            border: none;
-            cursor: pointer;
-            color: var(--text-main);
-            padding: 6px;
-        }
-
-        .mobile-menu {
-            display: none;
-            position: fixed;
-            top: 90px;
-            left: 16px;
-            right: 16px;
-            background: rgba(15, 23, 42, 0.95);
-            backdrop-filter: blur(24px);
-            -webkit-backdrop-filter: blur(24px);
-            border: 1px solid var(--surface-border);
-            border-radius: var(--radius-xl);
-            padding: 24px;
-            flex-direction: column;
-            gap: 18px;
-            z-index: 99;
-            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
-            transform-origin: top center;
-        }
-
-        .mobile-menu.open {
-            display: flex;
-        }
-
-        .mobile-nav-link {
-            color: var(--text-main);
-            text-decoration: none;
-            font-size: 1.05rem;
-            font-weight: 500;
-            padding: 10px 0;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-        }
-
-        .hero-container {
-            position: relative;
-            z-index: 10;
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 140px 24px 70px;
-            display: grid;
-            grid-template-columns: 1.15fr 0.85fr;
-            align-items: center;
-            gap: 50px;
-            min-height: 100vh;
-            min-height: 100dvh;
-        }
-
-        .hero-content {
-            max-width: 600px;
-        }
-
-        .badge-pill {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            padding: 6px 14px;
-            background: rgba(99, 102, 241, 0.1);
-            border: 1px solid rgba(99, 102, 241, 0.3);
-            border-radius: var(--radius-pill);
-            font-size: 0.82rem;
-            font-weight: 600;
-            color: #a5b4fc;
-            margin-bottom: 22px;
-        }
-
-        .badge-dot {
-            width: 7px;
-            height: 7px;
-            border-radius: 50%;
-            background: #38bdf8;
-            box-shadow: 0 0 10px #38bdf8;
-        }
-
-        .hero-title {
-            font-size: clamp(2.3rem, 5.2vw, 3.75rem);
-            font-weight: 800;
-            line-height: 1.12;
-            letter-spacing: -0.035em;
-            margin-bottom: 20px;
-        }
-
-        .gradient-text {
-            background: linear-gradient(135deg, #ffffff 20%, #a5b4fc 60%, #38bdf8 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        .hero-subtitle {
-            font-size: clamp(1rem, 1.8vw, 1.15rem);
-            line-height: 1.6;
-            color: var(--text-muted);
-            margin-bottom: 34px;
-            font-weight: 400;
-        }
-
-        .hero-cta-group {
-            display: flex;
-            align-items: center;
-            gap: 16px;
-            flex-wrap: wrap;
-            margin-bottom: 36px;
-        }
-
-        .btn-hero-primary {
-            display: inline-flex;
-            align-items: center;
-            gap: 10px;
-            background: var(--accent-gradient);
-            color: #fff;
-            text-decoration: none;
-            font-weight: 600;
-            font-size: 0.98rem;
-            padding: 14px 28px;
-            border-radius: var(--radius-pill);
-            box-shadow: 0 8px 24px var(--accent-glow);
-            transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s ease;
-            cursor: pointer;
-            border: none;
-        }
-
-        .btn-hero-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 12px 32px rgba(99, 102, 241, 0.45);
-        }
-
-        .btn-hero-primary svg {
-            width: 17px;
-            height: 17px;
-            transition: transform 0.2s ease;
-        }
-
-        .btn-hero-primary:hover svg {
-            transform: translateX(3px);
-        }
-
-        .btn-hero-secondary {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid var(--surface-border);
-            color: var(--text-main);
-            text-decoration: none;
-            font-weight: 600;
-            font-size: 0.98rem;
-            padding: 14px 26px;
-            border-radius: var(--radius-pill);
-            transition: background 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
-        }
-
-        .btn-hero-secondary:hover {
-            background: rgba(255, 255, 255, 0.09);
-            border-color: rgba(255, 255, 255, 0.16);
-            transform: translateY(-1px);
-        }
-
-        .social-proof {
-            display: flex;
-            align-items: center;
-            gap: 16px;
-        }
-
-        .avatars {
-            display: flex;
-            align-items: center;
-        }
-
-        .avatar {
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            border: 2px solid var(--bg-dark);
-            margin-left: -8px;
-            background: #1e293b;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 0.72rem;
-            font-weight: 700;
-            color: #94a3b8;
-        }
-
-        .avatar:first-child {
-            margin-left: 0;
-        }
-
-        .avatar-1 {
-            background: #3b82f6;
-            color: white;
-        }
-
-        .avatar-2 {
-            background: #8b5cf6;
-            color: white;
-        }
-
-        .avatar-3 {
-            background: #ec4899;
-            color: white;
-        }
-
-        .proof-text {
-            font-size: 0.85rem;
-            color: var(--text-muted);
-        }
-
-        .proof-text strong {
-            color: var(--text-main);
-        }
-
-        .hero-visual {
-            position: relative;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .dashboard-preview {
-            width: 100%;
-            max-width: 440px;
-            background: var(--bg-surface);
-            border: 1px solid var(--surface-border);
-            border-radius: var(--radius-xl);
-            padding: 24px;
-            backdrop-filter: blur(28px);
-            -webkit-backdrop-filter: blur(28px);
-            box-shadow:
-                0 24px 60px rgba(0, 0, 0, 0.5),
-                inset 0 1px 1px rgba(255, 255, 255, 0.1);
-            position: relative;
-        }
-
-        .preview-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 20px;
-            padding-bottom: 14px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-        }
-
-        .header-user {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .user-avatar-mini {
-            width: 32px;
-            height: 32px;
-            border-radius: 8px;
-            background: var(--accent-gradient);
-        }
-
-        .user-meta-title {
-            font-size: 0.85rem;
-            font-weight: 600;
-            color: var(--text-main);
-        }
-
-        .user-meta-sub {
-            font-size: 0.72rem;
-            color: var(--text-dim);
-        }
-
-        .status-badge {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            font-size: 0.74rem;
-            color: #34d399;
-            background: rgba(16, 185, 129, 0.1);
-            padding: 4px 10px;
-            border-radius: var(--radius-pill);
-            border: 1px solid rgba(52, 211, 153, 0.25);
-        }
-
-        .status-pulse {
-            width: 6px;
-            height: 6px;
-            border-radius: 50%;
-            background: #34d399;
-        }
-
-        /* Course items inside preview */
-        .course-list {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
-
-        .course-card {
-            background: rgba(255, 255, 255, 0.03);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            border-radius: var(--radius-lg);
-            padding: 14px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-
-        .course-info {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .course-symbol {
-            width: 38px;
-            height: 38px;
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 0.95rem;
-        }
-
-        .symbol-math {
-            background: rgba(99, 102, 241, 0.15);
-            color: #818cf8;
-        }
-
-        .symbol-cs {
-            background: rgba(6, 182, 212, 0.15);
-            color: #22d3ee;
-        }
-
-        .course-title {
-            font-size: 0.88rem;
-            font-weight: 600;
-            color: var(--text-main);
-            margin-bottom: 2px;
-        }
-
-        .course-meta {
-            font-size: 0.74rem;
-            color: var(--text-dim);
-        }
-
-        .progress-bar-wrap {
-            width: 60px;
-            height: 5px;
-            background: rgba(255, 255, 255, 0.08);
-            border-radius: var(--radius-pill);
-            overflow: hidden;
-        }
-
-        .progress-fill {
-            height: 100%;
-            background: var(--accent-gradient);
-            border-radius: var(--radius-pill);
-        }
-
-        /* Floating micro badges */
-        .float-badge {
-            position: absolute;
-            background: rgba(17, 24, 39, 0.85);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            border: 1px solid rgba(255, 255, 255, 0.12);
-            border-radius: var(--radius-lg);
-            padding: 12px 16px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            box-shadow: 0 16px 36px rgba(0, 0, 0, 0.45);
-            z-index: 2;
-        }
-
-        .float-badge-top {
-            top: -24px;
-            right: -18px;
-        }
-
-        .float-badge-bottom {
-            bottom: -22px;
-            left: -18px;
-        }
-
-        .float-icon {
-            width: 32px;
-            height: 32px;
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .float-icon.sparkle {
-            background: rgba(245, 158, 11, 0.15);
-            color: #fbbf24;
-        }
-
-        .float-icon.teacher {
-            background: rgba(99, 102, 241, 0.15);
-            color: #818cf8;
-        }
-
-        .float-title {
-            font-size: 0.72rem;
-            color: var(--text-dim);
-        }
-
-        .float-value {
-            font-size: 0.88rem;
-            font-weight: 700;
-            color: var(--text-main);
-        }
-
-        @media (max-width: 960px) {
-            .hero-container {
-                grid-template-columns: 1fr;
-                padding-top: 120px;
-                text-align: center;
-                gap: 60px;
-            }
-
-            .hero-content {
-                max-width: 100%;
-                margin: 0 auto;
-            }
-
-            .hero-cta-group {
-                justify-content: center;
-            }
-
-            .social-proof {
-                justify-content: center;
-            }
-
-            .float-badge-top {
-                right: 0px;
-            }
-
-            .float-badge-bottom {
-                left: 0px;
-            }
-        }
-
-        @media (max-width: 768px) {
-
-            .nav-links,
-            .nav-actions .btn-nav-primary {
-                display: none;
-            }
-
-            .btn-menu-toggle {
-                display: block;
-            }
-
-            .navbar {
-                padding: 0 16px;
-            }
-
-            .hero-container {
-                padding-top: 110px;
-                padding-bottom: 50px;
-            }
-
-            .float-badge {
-                padding: 8px 12px;
-            }
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="theme-color" content="#080c14">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="LifeOS">
+  <title>LifeOS — Personal Study, Goals & Private Vault</title>
+
+  <!-- Tailwind CSS CDN with extended design tokens -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            appDark: '#080c14',
+            surface: '#0e1524',
+            surfaceLight: '#141e33',
+            borderDark: '#1c2942',
+            borderGlow: 'rgba(99, 102, 241, 0.25)',
+            accent: '#6366f1',
+            accentHover: '#4f46e5'
+          },
+          fontFamily: {
+            sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
+            mono: ['JetBrains Mono', 'Menlo', 'Consolas', 'monospace']
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Google Fonts: Inter & JetBrains Mono for Timer -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600;800&display=swap" rel="stylesheet">
+  
+  <!-- Lucide Icons Vanilla CDN -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <style>
+    * {
+      -webkit-tap-highlight-color: transparent;
+      box-sizing: border-box;
+    }
+    body {
+      background-color: #080c14;
+      color: #e2e8f0;
+      font-family: 'Inter', sans-serif;
+      overflow-x: hidden;
+    }
+    input, textarea, select {
+      user-select: text;
+    }
+    /* Custom clean scrollbars */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #080c14;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #1c2942;
+      border-radius: 9999px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #2b3e63;
+    }
+    .safe-bottom {
+      padding-bottom: max(env(safe-area-inset-bottom), 14px);
+    }
+    .hide-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+    .hide-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+    .glass-card {
+      background: linear-gradient(135deg, rgba(14, 21, 36, 0.95) 0%, rgba(20, 30, 51, 0.7) 100%);
+      border: 1px solid #1c2942;
+      backdrop-filter: blur(12px);
+    }
+    .glass-card:hover {
+      border-color: rgba(99, 102, 241, 0.35);
+    }
+    .keyboard-badge {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      padding: 1px 6px;
+      border-radius: 4px;
+      background: #1c2942;
+      color: #94a3b8;
+      border: 1px solid #2b3e63;
+    }
+  </style>
 </head>
+<body class="min-h-screen bg-[#080c14] text-slate-100 antialiased selection:bg-indigo-600 selection:text-white">
 
-<body>
-
-    <div class="ambient-canvas">
-        <div class="ambient-orb orb-purple"></div>
-        <div class="ambient-orb orb-cyan"></div>
-    </div>
-    <div class="grid-lines"></div>
-
-    <header class="nav-wrapper">
-        <nav class="navbar" id="mainNavbar">
-            <!-- Brand Logo -->
-            <a href="#" class="brand">
-                <div class="brand-icon">
-                    <svg viewBox="0 0 24 24" fill="none" stroke-width="2.3" stroke-linecap="round"
-                        stroke-linejoin="round">
-                        <path d="M22 10v6M2 10l10-5 10 5-10 5z" />
-                        <path d="M6 12v5c3 3 9 3 12 0v-5" />
-                    </svg>
-                </div>
-                <span>EduConnect</span>
-            </a>
-
-            <!-- Desktop Links -->
-            <ul class="nav-links">
-                <li><a href="#dashboard" class="nav-link">Dashboard</a></li>
-                <li><a href="#assignments" class="nav-link">Assignments</a></li>
-                <li><a href="#teachers" class="nav-link">Teachers</a></li>
-            </ul>
-
-            <!-- Action Button / Mobile Toggle -->
-            <div class="nav-actions">
-                <a href="#signin" class="btn-nav-primary">Get Started</a>
-                <button class="btn-menu-toggle" id="menuToggle" aria-label="Toggle Navigation Menu">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                        stroke-linecap="round" stroke-linejoin="round">
-                        <line x1="3" y1="12" x2="21" y2="12" />
-                        <line x1="3" y1="6" x2="21" y2="6" />
-                        <line x1="3" y1="18" x2="21" y2="18" />
-                    </svg>
-                </button>
-            </div>
-        </nav>
-    </header>
-
-    <div class="mobile-menu" id="mobileMenu">
-        <a href="#dashboard" class="mobile-nav-link" onclick="closeMobileMenu()">Dashboard</a>
-        <a href="#assignments" class="mobile-nav-link" onclick="closeMobileMenu()">Assignments</a>
-        <a href="#teachers" class="mobile-nav-link" onclick="closeMobileMenu()">Teachers</a>
-        <a href="#signin" class="btn-hero-primary" style="justify-content: center; margin-top: 8px;"
-            onclick="closeMobileMenu()">Get Started</a>
-    </div>
-
-    <main class="hero-container">
-        <!-- Left Column: Content -->
-        <section class="hero-content">
-            <div class="badge-pill gsap-hero-item">
-                <span class="badge-dot"></span>
-                <span>Next-Gen Education Platform</span>
-            </div>
-
-            <h1 class="hero-title gsap-hero-item">
-                Empowering Minds, <br />
-                <span class="gradient-text">Connecting Futures.</span>
+  <div class="min-h-screen flex flex-col lg:flex-row w-full max-w-[1600px] mx-auto relative">
+    
+    <!-- DESKTOP LEFT SIDEBAR (Visible on lg screens: >= 1024px) -->
+    <aside class="hidden lg:flex flex-col w-72 shrink-0 border-r border-[#1c2942] bg-[#0b101c] p-5 justify-between sticky top-0 h-screen z-30">
+      <div class="space-y-6">
+        <!-- Logo & Local Privacy Indicator -->
+        <div class="flex items-center space-x-3 px-2">
+          <div class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-indigo-600 via-indigo-500 to-violet-600 flex items-center justify-center text-white shadow-xl shadow-indigo-600/30">
+            <i data-lucide="shield-check" class="w-5 h-5"></i>
+          </div>
+          <div>
+            <h1 class="text-base font-extrabold tracking-tight text-white flex items-center gap-1.5">
+              <span>LifeOS</span>
+              <span class="text-[9px] px-1.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-mono">LOCAL</span>
             </h1>
+            <p class="text-xs text-slate-400">Personal & Air-Gapped</p>
+          </div>
+        </div>
 
-            <p class="hero-subtitle gsap-hero-item">
-                EduConnect bridges students, educators, and interactive coursework in one seamless ecosystem. Organize
-                assignments, consult top mentors, and track real progress in real time.
+        <!-- Desktop Navigation Links with Key Badges -->
+        <nav class="space-y-1.5 pt-2">
+          <button onclick="switchTab('dashboard')" id="side-dashboard" class="side-nav-btn w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-sm font-semibold transition group bg-indigo-600/10 text-indigo-400 border border-indigo-500/30">
+            <div class="flex items-center gap-3">
+              <i data-lucide="layout-dashboard" class="w-4 h-4"></i>
+              <span>Dashboard</span>
+            </div>
+            <span class="keyboard-badge hidden xl:inline-block">1</span>
+          </button>
+
+          <button onclick="switchTab('study')" id="side-study" class="side-nav-btn w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-sm font-semibold transition group text-slate-400 hover:text-slate-200 hover:bg-[#141e33] border border-transparent">
+            <div class="flex items-center gap-3">
+              <i data-lucide="timer" class="w-4 h-4"></i>
+              <span>Study & Timer</span>
+            </div>
+            <span class="keyboard-badge hidden xl:inline-block">2</span>
+          </button>
+
+          <button onclick="switchTab('goals')" id="side-goals" class="side-nav-btn w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-sm font-semibold transition group text-slate-400 hover:text-slate-200 hover:bg-[#141e33] border border-transparent">
+            <div class="flex items-center gap-3">
+              <i data-lucide="target" class="w-4 h-4"></i>
+              <span>Goals & Milestones</span>
+            </div>
+            <span class="keyboard-badge hidden xl:inline-block">3</span>
+          </button>
+
+          <button onclick="switchTab('diary')" id="side-diary" class="side-nav-btn w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-sm font-semibold transition group text-slate-400 hover:text-slate-200 hover:bg-[#141e33] border border-transparent">
+            <div class="flex items-center gap-3">
+              <i data-lucide="book-open" class="w-4 h-4"></i>
+              <span>Private Journal</span>
+            </div>
+            <span class="keyboard-badge hidden xl:inline-block">4</span>
+          </button>
+
+          <button onclick="switchTab('settings')" id="side-settings" class="side-nav-btn w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-sm font-semibold transition group text-slate-400 hover:text-slate-200 hover:bg-[#141e33] border border-transparent">
+            <div class="flex items-center gap-3">
+              <i data-lucide="hard-drive" class="w-4 h-4"></i>
+              <span>Data Fortress</span>
+            </div>
+            <span class="keyboard-badge hidden xl:inline-block">5</span>
+          </button>
+        </nav>
+
+        <!-- Quick Desktop Mini-Widget: Active Timer Status -->
+        <div class="p-3.5 rounded-2xl bg-[#0e1524] border border-[#1c2942] space-y-2">
+          <div class="flex items-center justify-between text-xs font-semibold text-slate-400">
+            <span class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span> Timer Engine</span>
+            <span id="sideTimerMini" class="font-mono text-indigo-400">25:00</span>
+          </div>
+          <p id="sideTimerMiniStatus" class="text-[11px] text-slate-400">Pomodoro ready</p>
+          <button onclick="toggleTimer()" class="w-full py-1.5 rounded-lg bg-[#141e33] hover:bg-indigo-600 text-xs font-semibold text-white transition flex items-center justify-center gap-1">
+            <i data-lucide="play" class="w-3 h-3 fill-current"></i> Toggle Spacebar
+          </button>
+        </div>
+      </div>
+
+      <!-- Bottom Sidebar Info & PWA / Backup Quick Trigger -->
+      <div class="space-y-3 pt-4 border-t border-[#1c2942]">
+        <div class="flex items-center justify-between text-xs text-slate-400 px-1">
+          <span class="flex items-center gap-1.5"><i data-lucide="database" class="w-3.5 h-3.5 text-indigo-400"></i> Local Storage</span>
+          <span id="sideStorageSize" class="text-[11px] font-mono text-slate-300">0 KB</span>
+        </div>
+        <button onclick="openInstallGuide()" class="w-full py-2 px-3 rounded-xl bg-[#141e33] hover:bg-[#1c2942] border border-[#1c2942] text-xs font-medium text-slate-300 transition flex items-center justify-center gap-2">
+          <i data-lucide="smartphone" class="w-3.5 h-3.5 text-indigo-400"></i>
+          <span>Add PWA to Mobile</span>
+        </button>
+      </div>
+    </aside>
+
+    <div class="flex-1 flex flex-col min-w-0 pb-24 lg:pb-8">
+      
+      <!-- MOBILE & TABLET HEADER (Hidden on desktop lg: >= 1024px) -->
+      <header class="lg:hidden sticky top-0 z-30 px-4 py-3 bg-[#080c14]/90 backdrop-blur-md border-b border-[#1c2942] flex items-center justify-between">
+        <div class="flex items-center space-x-2.5">
+          <div class="w-8 h-8 rounded-xl bg-gradient-to-tr from-indigo-600 to-violet-600 flex items-center justify-center text-white shadow-lg shadow-indigo-600/30">
+            <i data-lucide="shield-check" class="w-4 h-4"></i>
+          </div>
+          <div>
+            <h1 class="text-sm font-bold text-white tracking-wide leading-tight">LifeOS</h1>
+            <p class="text-[10px] text-emerald-400 font-medium flex items-center gap-1">
+              <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span> 100% Local & Private
             </p>
+          </div>
+        </div>
+        <div class="flex items-center gap-2">
+          <button onclick="openInstallGuide()" class="px-2.5 py-1 text-[11px] font-semibold rounded-lg bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 hover:bg-indigo-500/20 transition flex items-center gap-1">
+            <i data-lucide="smartphone" class="w-3 h-3"></i>
+            <span>Install</span>
+          </button>
+        </div>
+      </header>
 
-            <div class="hero-cta-group gsap-hero-item">
-                <a href="#get-started" class="btn-hero-primary">
-                    <span>Get Started</span>
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round"
-                        stroke-linejoin="round">
-                        <line x1="5" y1="12" x2="19" y2="12" />
-                        <polyline points="12 5 19 12 12 19" />
-                    </svg>
-                </a>
-                <a href="#demo" class="btn-hero-secondary">Explore Platform</a>
+      <!-- Toast Feedback Popup -->
+      <div id="toastBox" class="fixed top-5 right-5 z-50 pointer-events-none transition-all duration-300 opacity-0 transform translate-y-[-8px]">
+        <div id="toastContent" class="px-4 py-2.5 bg-[#0e1524]/95 text-indigo-200 border border-indigo-500/40 rounded-xl text-xs font-semibold shadow-2xl backdrop-blur-md flex items-center gap-2">
+          <i data-lucide="check-circle-2" class="w-4 h-4 text-emerald-400"></i>
+          <span id="toastText">Notification text</span>
+        </div>
+      </div>
+
+      <!-- MAIN VIEW ROUTER CONTAINER -->
+      <main class="flex-1 p-4 sm:p-6 lg:p-8 max-w-7xl w-full mx-auto">
+
+        <!-- ================= VIEW 1: DASHBOARD ================= -->
+        <section id="view-dashboard" class="space-y-6">
+          
+          <!-- Top Desktop Header Greeting Banner -->
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-6 rounded-3xl bg-gradient-to-r from-indigo-950/40 via-[#0e1524] to-[#0e1524] border border-[#1c2942]">
+            <div>
+              <div class="inline-flex items-center gap-2 px-2.5 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-xs font-semibold text-indigo-300 mb-2">
+                <i data-lucide="flame" class="w-3.5 h-3.5 text-amber-400"></i>
+                <span>Discipline Streak: <strong id="streakCount" class="text-white">1 Day</strong></span>
+              </div>
+              <h2 class="text-xl sm:text-2xl font-black text-white tracking-tight">Your Private Life Command Center</h2>
+              <p class="text-xs sm:text-sm text-slate-400 mt-1 max-w-2xl">
+                Encrypted in this browser's isolated local storage. No tracking scripts, zero internet required once loaded.
+              </p>
+            </div>
+            <div class="flex items-center gap-3 shrink-0">
+              <button onclick="switchTab('study')" class="px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-xs shadow-lg shadow-indigo-600/30 flex items-center gap-2 transition active:scale-95">
+                <i data-lucide="play" class="w-3.5 h-3.5 fill-current"></i>
+                <span>Start Pomodoro</span>
+              </button>
+              <button onclick="openNewDiaryModal()" class="px-4 py-2.5 rounded-xl bg-[#141e33] hover:bg-[#1c2942] border border-[#1c2942] text-white font-semibold text-xs flex items-center gap-2 transition active:scale-95">
+                <i data-lucide="pen-tool" class="w-3.5 h-3.5 text-indigo-400"></i>
+                <span>Write Entry</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Multi-column Metrics Grid (4 columns on PC, 2 on tablet, 1 on small mobile) -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div class="glass-card p-5 rounded-2xl">
+              <div class="flex items-center justify-between text-slate-400 text-xs font-semibold uppercase tracking-wider">
+                <span>Today's Focus</span>
+                <i data-lucide="clock" class="w-4 h-4 text-indigo-400"></i>
+              </div>
+              <div class="flex items-baseline gap-1.5 mt-2">
+                <span id="dashTodayHours" class="text-3xl font-black text-white tracking-tight">0.0</span>
+                <span class="text-xs text-slate-400">hours</span>
+              </div>
+              <p id="dashTodayMinutes" class="text-xs text-indigo-400 font-medium mt-1">0 mins logged</p>
             </div>
 
-            <!-- <div class="social-proof gsap-hero-item">
-                <div class="avatars">
-                    <div class="avatar avatar-1">JD</div>
-                    <div class="avatar avatar-2">SK</div>
-                    <div class="avatar avatar-3">AL</div>
-                </div>
-                <p class="proof-text">
-                    Joined by <strong>12,000+ students</strong> and educators worldwide.
-                </p>
-            </div>
-        </section> -->
-
-        <!-- Right Column: Visual Dashboard Mockup -->
-        <section class="hero-visual">
-            <!-- Floating Badge: Success Rate -->
-            <div class="float-badge float-badge-top gsap-float-badge" id="floatTop">
-                <div class="float-icon sparkle">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
-                        stroke-linecap="round" stroke-linejoin="round">
-                        <polygon
-                            points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
-                    </svg>
-                </div>
-                <div>
-                    <!-- <div class="float-title">Course Completion</div>
-                    <div class="float-value">98.4% Average</div> -->
-                </div>
+            <div class="glass-card p-5 rounded-2xl">
+              <div class="flex items-center justify-between text-slate-400 text-xs font-semibold uppercase tracking-wider">
+                <span>7-Day Study Total</span>
+                <i data-lucide="calendar" class="w-4 h-4 text-violet-400"></i>
+              </div>
+              <div class="flex items-baseline gap-1.5 mt-2">
+                <span id="dashWeekHours" class="text-3xl font-black text-white tracking-tight">0.0</span>
+                <span class="text-xs text-slate-400">hours</span>
+              </div>
+              <p class="text-xs text-slate-400 mt-1">Past rolling 7 days</p>
             </div>
 
-            <!-- Core Glassmorphic Dashboard Card
-            <div class="dashboard-preview" id="mainCard">
-                <div class="preview-header">
-                    <div class="header-user">
-                        <div class="user-avatar-mini"></div>
-                        <div>
-                            <div class="user-meta-title">Spring Term '26</div>
-                            <div class="user-meta-sub">Enrolled in 4 classes</div>
-                        </div>
-                    </div>
-                    <div class="status-badge">
-                        <span class="status-pulse"></span>
-                        <span>Live Session</span>
-                    </div>
-                </div> -->
-<!-- 
-                <div class="course-list">
-                    <div class="course-card">
-                        <div class="course-info">
-                            <div class="course-symbol symbol-math">∑</div>
-                            <div>
-                                <div class="course-title">Applied Calculus II</div>
-                                <div class="course-meta">Prof. Harrison • Due Tomorrow</div>
-                            </div>
-                        </div>
-                        <div class="progress-bar-wrap">
-                            <div class="progress-fill" style="width: 82%;"></div>
-                        </div>
-                    </div>
+            <div class="glass-card p-5 rounded-2xl">
+              <div class="flex items-center justify-between text-slate-400 text-xs font-semibold uppercase tracking-wider">
+                <span>Milestone Progress</span>
+                <i data-lucide="check-square" class="w-4 h-4 text-emerald-400"></i>
+              </div>
+              <div class="flex items-baseline gap-1.5 mt-2">
+                <span id="dashGoalPercent" class="text-3xl font-black text-white tracking-tight">0%</span>
+                <span class="text-xs text-slate-400">done</span>
+              </div>
+              <div class="w-full bg-[#080c14] h-2 rounded-full overflow-hidden mt-2 border border-[#1c2942]">
+                <div id="dashGoalBar" class="h-full bg-gradient-to-r from-indigo-500 to-emerald-400 w-0 transition-all duration-500"></div>
+              </div>
+            </div>
 
-                    <div class="course-card">
-                        <div class="course-info">
-                            <div class="course-symbol symbol-cs">&lt;/&gt;</div>
-                            <div>
-                                <div class="course-title">Algorithms & Data</div>
-                                <div class="course-meta">Dr. Elena Chen • 3 Modules left</div>
-                            </div>
-                        </div>
- v>
-            </div>                       <div class="progress-bar-wrap">
-                            <div class="progress-fill" style="width: 64%;"></div>
-                        </div>
-                    </div>
-                </di -->
+            <div class="glass-card p-5 rounded-2xl">
+              <div class="flex items-center justify-between text-slate-400 text-xs font-semibold uppercase tracking-wider">
+                <span>Diary Vault</span>
+                <i data-lucide="lock" class="w-4 h-4 text-amber-400"></i>
+              </div>
+              <div class="flex items-baseline gap-1.5 mt-2">
+                <span id="dashTotalEntries" class="text-3xl font-black text-white tracking-tight">0</span>
+                <span class="text-xs text-slate-400">reflections</span>
+              </div>
+              <p class="text-xs text-slate-400 mt-1">Protected by PIN</p>
+            </div>
+          </div>
 
-            <!-- Floating Badge: Mentors -->
-            <!-- <div class="float-badge float-badge-bottom gsap-float-badge" id="floatBottom">
-                <div class="float-icon teacher">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
-                        stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
-                        <circle cx="9" cy="7" r="4" />
-                        <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
-                        <path d="M16 3.13a4 4 0 0 1 0 7.75" />
-                    </svg>
+          <!-- Desktop 2-Column Split: Active Goals Preview (Left) & Recent Study Logs (Right) -->
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            
+            <!-- Left Column: Active Goals Summary -->
+            <div class="glass-card p-5 rounded-2xl space-y-4">
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                  <i data-lucide="target" class="w-4 h-4 text-indigo-400"></i>
+                  <h3 class="text-sm font-bold text-white">Active Milestone Targets</h3>
                 </div>
-                <div>
-                    <div class="float-title">Verified Educators</div>
-                    <div class="float-value">850+ Active Teachers</div>
+                <button onclick="switchTab('goals')" class="text-xs text-indigo-400 hover:text-indigo-300 font-semibold flex items-center gap-1">
+                  <span>View all</span> <i data-lucide="chevron-right" class="w-3.5 h-3.5"></i>
+                </button>
+              </div>
+              <div id="dashGoalsPreview" class="space-y-3">
+                <!-- Injected via JS -->
+              </div>
+            </div>
+
+            <!-- Right Column: Recent Study Logs -->
+            <div class="glass-card p-5 rounded-2xl space-y-4">
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                  <i data-lucide="history" class="w-4 h-4 text-violet-400"></i>
+                  <h3 class="text-sm font-bold text-white">Recent Deep Work Logs</h3>
                 </div>
-            </div> -->
+                <button onclick="switchTab('study')" class="text-xs text-indigo-400 hover:text-indigo-300 font-semibold flex items-center gap-1">
+                  <span>Open Timer</span> <i data-lucide="chevron-right" class="w-3.5 h-3.5"></i>
+                </button>
+              </div>
+              <div id="dashStudyPreview" class="space-y-2.5">
+                <!-- Injected via JS -->
+              </div>
+            </div>
+          </div>
+
+          <!-- Full-width Recent Diary Preview Card -->
+          <div class="glass-card p-5 rounded-2xl">
+            <div class="flex items-center justify-between mb-3">
+              <div class="flex items-center gap-2">
+                <i data-lucide="book-marked" class="w-4 h-4 text-amber-400"></i>
+                <h3 class="text-sm font-bold text-white">Latest Reflection</h3>
+              </div>
+              <button onclick="switchTab('diary')" class="text-xs text-indigo-400 hover:text-indigo-300 font-semibold flex items-center gap-1">
+                <span>Open Journal</span> <i data-lucide="chevron-right" class="w-3.5 h-3.5"></i>
+              </button>
+            </div>
+            <div id="dashRecentDiary">
+              <p class="text-xs text-slate-400 italic">No entries written yet.</p>
+            </div>
+          </div>
+
         </section>
-    </main>
 
-    <script>
-        // Safe Mobile Menu Handler
-        const menuToggle = document.getElementById('menuToggle');
-        const mobileMenu = document.getElementById('mobileMenu');
-        let isMenuOpen = false;
+        <!-- ================= VIEW 2: STUDY & TIMER ================= -->
+        <section id="view-study" class="space-y-6 hidden">
+          
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-2 border-b border-[#1c2942]">
+            <div>
+              <h2 class="text-lg sm:text-xl font-bold text-white tracking-tight">Study Hub & Pomodoro Engine</h2>
+              <p class="text-xs text-slate-400">Count down focus sprints or count up stopwatch sessions</p>
+            </div>
+            <div class="flex items-center gap-2">
+              <button onclick="openManualStudyModal()" class="px-3.5 py-2 rounded-xl bg-[#141e33] hover:bg-[#1c2942] border border-[#1c2942] text-xs font-semibold text-indigo-300 flex items-center gap-1.5 transition">
+                <i data-lucide="plus" class="w-3.5 h-3.5"></i>
+                <span>Manual Entry</span>
+              </button>
+            </div>
+          </div>
 
-        menuToggle.addEventListener('click', () => {
-            isMenuOpen = !isMenuOpen;
-            if (isMenuOpen) {
-                mobileMenu.classList.add('open');
-                gsap.fromTo(mobileMenu,
-                    { opacity: 0, y: -12, scale: 0.98 },
-                    { opacity: 1, y: 0, scale: 1, duration: 0.28, ease: 'power2.out' }
-                );
-            } else {
-                closeMobileMenu();
-            }
-        });
+          <!-- Responsive 2-Column Grid on Desktop (Left: Big Timer; Right: Context & History) -->
+          <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+            
+            <!-- Left Side: Interactive Timer Pod (5 cols on lg) -->
+            <div class="lg:col-span-5 space-y-4">
+              <div class="glass-card p-6 sm:p-8 rounded-3xl text-center relative overflow-hidden border border-[#1c2942]">
+                
+                <!-- Modes -->
+                <div class="flex rounded-xl bg-[#080c14] p-1 border border-[#1c2942] mb-6">
+                  <button id="btnModePomo" onclick="setTimerMode('pomodoro', 25)" class="flex-1 py-2 text-xs font-bold rounded-lg bg-indigo-600 text-white transition">
+                    Pomodoro (25m)
+                  </button>
+                  <button id="btnModeBreak" onclick="setTimerMode('break', 5)" class="flex-1 py-2 text-xs font-semibold rounded-lg text-slate-400 hover:text-white transition">
+                    Break (5m)
+                  </button>
+                  <button id="btnModeStopwatch" onclick="setTimerMode('stopwatch', 0)" class="flex-1 py-2 text-xs font-semibold rounded-lg text-slate-400 hover:text-white transition">
+                    Stopwatch
+                  </button>
+                </div>
 
-        function closeMobileMenu() {
-            if (!isMenuOpen) return;
-            gsap.to(mobileMenu, {
-                opacity: 0,
-                y: -10,
-                duration: 0.2,
-                ease: 'power2.in',
-                onComplete: () => {
-                    mobileMenu.classList.remove('open');
-                    isMenuOpen = false;
-                }
-            });
+                <!-- Subject selector -->
+                <div class="mb-4">
+                  <label class="text-[10px] uppercase font-bold text-slate-400 tracking-wider block mb-1.5">Subject Focus</label>
+                  <select id="timerSubject" class="w-full max-w-xs mx-auto px-3.5 py-2 rounded-xl bg-[#080c14] border border-[#1c2942] text-xs font-semibold text-white focus:outline-none focus:border-indigo-500">
+                    <option value="Computer Science">Computer Science</option>
+                    <option value="Mathematics">Mathematics</option>
+                    <option value="Engineering & System Design">Engineering & System Design</option>
+                    <option value="Languages & Reading">Languages & Reading</option>
+                    <option value="General Deep Study">General Deep Study</option>
+                  </select>
+                </div>
+
+                <!-- Digits -->
+                <div id="timerDisplay" class="text-6xl sm:text-7xl font-black text-white my-4 font-mono tracking-tighter">
+                  25:00
+                </div>
+
+                <p id="timerStatusText" class="text-xs text-slate-400 mb-6">Press Space or click Start to begin session.</p>
+
+                <!-- Controls -->
+                <div class="flex items-center justify-center gap-3">
+                  <button id="btnTimerToggle" onclick="toggleTimer()" class="px-6 py-3.5 rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs sm:text-sm font-bold flex items-center gap-2 shadow-xl shadow-indigo-600/30 active:scale-95 transition">
+                    <i id="timerPlayIcon" data-lucide="play" class="w-4 h-4 fill-current"></i>
+                    <span id="timerPlayText">Start Focus</span>
+                  </button>
+                  <button id="btnTimerReset" onclick="resetTimer()" class="p-3.5 rounded-2xl bg-[#080c14] border border-[#1c2942] text-slate-300 hover:text-white active:scale-95 transition" title="Reset (R)">
+                    <i data-lucide="rotate-ccw" class="w-4 h-4"></i>
+                  </button>
+                  <button id="btnStopwatchFinish" onclick="finishStopwatch()" class="px-5 py-3.5 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs sm:text-sm font-bold hidden active:scale-95 transition">
+                    Finish & Log
+                  </button>
+                </div>
+
+                <div class="mt-6 pt-4 border-t border-[#1c2942]/60 flex items-center justify-center gap-2 text-[11px] text-slate-500">
+                  <span class="keyboard-badge">Space</span> toggle
+                  <span class="keyboard-badge ml-2">R</span> reset
+                </div>
+              </div>
+
+              <!-- Session Context Input Box -->
+              <div class="glass-card p-4 rounded-2xl space-y-3">
+                <h4 class="text-xs font-bold uppercase tracking-wider text-slate-400">Current Session Context</h4>
+                <input id="timerNotes" type="text" placeholder="What are you mastering in this session?..." class="w-full px-3 py-2 text-xs rounded-xl bg-[#080c14] border border-[#1c2942] text-white focus:outline-none focus:border-indigo-500">
+                <div class="flex items-center justify-between">
+                  <span class="text-xs text-slate-400 font-medium">Confidence / Mastery:</span>
+                  <div id="starContainer" class="flex gap-1 text-base">
+                    <button onclick="setStudyRating(1)" class="star-btn text-amber-400">★</button>
+                    <button onclick="setStudyRating(2)" class="star-btn text-amber-400">★</button>
+                    <button onclick="setStudyRating(3)" class="star-btn text-amber-400">★</button>
+                    <button onclick="setStudyRating(4)" class="star-btn text-amber-400">★</button>
+                    <button onclick="setStudyRating(5)" class="star-btn text-slate-600">★</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Right Side: Study Session Logs Table / Feed (7 cols on lg) -->
+            <div class="lg:col-span-7 space-y-3">
+              <div class="flex items-center justify-between">
+                <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400">Recorded Study History</h3>
+                <span id="studyLogsCount" class="text-xs text-slate-500">0 logs</span>
+              </div>
+              <div id="studyLogsList" class="space-y-2.5 max-h-[600px] overflow-y-auto pr-1">
+                <!-- Injected via JS -->
+              </div>
+            </div>
+
+          </div>
+        </section>
+
+        <!-- ================= VIEW 3: GOALS ================= -->
+        <section id="view-goals" class="space-y-6 hidden">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-2 border-b border-[#1c2942]">
+            <div>
+              <h2 class="text-lg sm:text-xl font-bold text-white tracking-tight">Goals & Objective Milestones</h2>
+              <p class="text-xs text-slate-400">Track progress by checking off specific sub-milestones</p>
+            </div>
+            <div class="flex items-center gap-2">
+              <button onclick="openAddGoalModal()" class="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold flex items-center gap-1.5 shadow-lg shadow-indigo-600/30 active:scale-95 transition">
+                <i data-lucide="plus" class="w-4 h-4"></i>
+                <span>Add Goal</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Category filter buttons -->
+          <div class="flex items-center gap-2 overflow-x-auto pb-1 hide-scrollbar text-xs">
+            <button onclick="filterGoalsCategory('All')" id="goalCatBtn-All" class="px-3.5 py-1.5 rounded-xl font-semibold bg-indigo-600 text-white transition">All Categories</button>
+            <button onclick="filterGoalsCategory('Career')" id="goalCatBtn-Career" class="px-3.5 py-1.5 rounded-xl font-semibold bg-[#141e33] text-slate-400 hover:text-white transition">Career</button>
+            <button onclick="filterGoalsCategory('Academic')" id="goalCatBtn-Academic" class="px-3.5 py-1.5 rounded-xl font-semibold bg-[#141e33] text-slate-400 hover:text-white transition">Academic</button>
+            <button onclick="filterGoalsCategory('Health')" id="goalCatBtn-Health" class="px-3.5 py-1.5 rounded-xl font-semibold bg-[#141e33] text-slate-400 hover:text-white transition">Health</button>
+            <button onclick="filterGoalsCategory('Personal')" id="goalCatBtn-Personal" class="px-3.5 py-1.5 rounded-xl font-semibold bg-[#141e33] text-slate-400 hover:text-white transition">Personal</button>
+          </div>
+
+          <!-- Multi-column Responsive Goals Grid (2 cols on md, 3 cols on xl) -->
+          <div id="goalsList" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
+            <!-- Injected via JS -->
+          </div>
+        </section>
+
+        <!-- ================= VIEW 4: DIARY ================= -->
+        <section id="view-diary" class="space-y-6 hidden">
+          
+          <!-- PIN Lock Challenge -->
+          <div id="diaryLockScreen" class="p-8 sm:p-12 text-center rounded-3xl glass-card max-w-md mx-auto space-y-4 my-8">
+            <div class="w-14 h-14 mx-auto rounded-2xl bg-indigo-500/10 text-indigo-400 flex items-center justify-center">
+              <i data-lucide="lock" class="w-7 h-7"></i>
+            </div>
+            <h3 class="text-base font-bold text-white">Private Diary Protected</h3>
+            <p class="text-xs text-slate-400 leading-relaxed">
+              Enter your 4-digit security PIN to unlock and read your private daily logs.
+            </p>
+            <div class="max-w-[200px] mx-auto space-y-2 pt-2">
+              <input id="diaryPinInput" type="password" maxlength="4" pattern="[0-9]*" inputmode="numeric" placeholder="••••" class="w-full py-2.5 text-center text-2xl tracking-widest font-mono rounded-xl bg-[#080c14] border border-[#1c2942] text-white focus:outline-none focus:border-indigo-500">
+              <button onclick="unlockDiary()" class="w-full py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold transition">
+                Unlock Journal
+              </button>
+              <p id="pinErrorMsg" class="text-[11px] text-rose-400 font-medium hidden">Incorrect passcode</p>
+            </div>
+            <p class="text-[11px] text-slate-500 pt-2">Default PIN: <strong class="text-slate-400 font-mono">1234</strong> (can be updated in Settings)</p>
+          </div>
+
+          <!-- Unlocked Split-Pane Layout on PC -->
+          <div id="diaryUnlockedScreen" class="space-y-4 hidden">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-2 border-b border-[#1c2942]">
+              <div>
+                <h2 class="text-lg sm:text-xl font-bold text-white tracking-tight">Personal Journal & Diary</h2>
+                <p class="text-xs text-slate-400">Offline encrypted thoughts and reflections</p>
+              </div>
+              <div class="flex items-center gap-2">
+                <button onclick="lockDiary()" class="p-2 rounded-xl bg-[#141e33] border border-[#1c2942] text-slate-300 hover:text-indigo-400 transition" title="Lock Diary">
+                  <i data-lucide="lock" class="w-4 h-4"></i>
+                </button>
+                <button onclick="openNewDiaryModal()" class="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold transition flex items-center gap-1.5 shadow-lg shadow-indigo-600/30">
+                  <i data-lucide="plus" class="w-4 h-4"></i>
+                  <span>New Reflection</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Desktop Split Layout (Left: Search & Entries List; Right: Selected Entry Reader) -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+              
+              <!-- Entries List Column (5 cols on lg) -->
+              <div class="lg:col-span-5 space-y-3">
+                <div class="relative">
+                  <i data-lucide="search" class="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2"></i>
+                  <input id="diarySearchInput" oninput="renderDiary()" type="text" placeholder="Search entries or #tags..." class="w-full pl-9 pr-3 py-2 text-xs rounded-xl bg-[#080c14] border border-[#1c2942] text-white focus:outline-none focus:border-indigo-500">
+                </div>
+                <div id="diaryList" class="space-y-2.5 max-h-[600px] overflow-y-auto pr-1">
+                  <!-- Injected via JS -->
+                </div>
+              </div>
+
+              <!-- Reader / Detailed Viewer Column (7 cols on lg) -->
+              <div class="lg:col-span-7 glass-card p-6 rounded-3xl min-h-[400px] flex flex-col justify-between">
+                <div id="diaryReaderPane" class="space-y-4">
+                  <div class="text-center py-16 text-slate-500 space-y-2">
+                    <i data-lucide="book-open" class="w-10 h-10 mx-auto opacity-40"></i>
+                    <p class="text-xs">Select an entry from the list to read full contents.</p>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+          </div>
+
+        </section>
+
+        <!-- ================= VIEW 5: SETTINGS & VAULT ================= -->
+        <section id="view-settings" class="space-y-6 hidden">
+          <div class="pb-2 border-b border-[#1c2942]">
+            <h2 class="text-lg sm:text-xl font-bold text-white tracking-tight">Data Fortress & Settings</h2>
+            <p class="text-xs text-slate-400">Zero cloud, zero cookies. Full sovereignty over your personal data.</p>
+          </div>
+
+          <!-- Multi-column Settings Grid on Desktop -->
+          <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            
+            <!-- Left 2 Columns: Storage Info & Backup Actions -->
+            <div class="lg:col-span-2 space-y-5">
+              
+              <!-- Privacy Banner -->
+              <div class="p-5 rounded-2xl bg-emerald-950/20 border border-emerald-500/30 space-y-2">
+                <div class="flex items-center gap-2 text-emerald-400 text-xs font-bold">
+                  <i data-lucide="shield-alert" class="w-4 h-4"></i>
+                  <span>100% Air-Gapped Local-First Architecture</span>
+                </div>
+                <p class="text-xs text-slate-300 leading-relaxed">
+                  Your study records, milestones, and diary logs are never sent to a cloud server or analyzed by third parties. They live entirely in this device’s isolated browser storage.
+                </p>
+              </div>
+
+              <!-- Backup / Export Box -->
+              <div class="glass-card p-5 rounded-2xl space-y-4">
+                <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400">Data Backup & Migration</h3>
+                <p class="text-xs text-slate-400 leading-relaxed">
+                  Export your entire database into a single JSON file. You can keep it on your computer, email it to yourself, or restore it on any other phone or PC.
+                </p>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+                  <button onclick="exportDataJson()" class="w-full py-3 px-4 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-xs flex items-center justify-center gap-2 shadow-lg shadow-indigo-600/25 active:scale-95 transition">
+                    <i data-lucide="download" class="w-4 h-4"></i>
+                    <span>Export JSON Backup</span>
+                  </button>
+                  <label class="w-full py-3 px-4 rounded-xl bg-[#080c14] hover:bg-[#141e33] border border-[#1c2942] text-slate-300 hover:text-white font-semibold text-xs flex items-center justify-center gap-2 cursor-pointer active:scale-95 transition">
+                    <i data-lucide="upload" class="w-4 h-4"></i>
+                    <span>Restore from JSON</span>
+                    <input type="file" id="importFileInput" accept=".json" onchange="importDataJson(event)" class="hidden">
+                  </label>
+                </div>
+              </div>
+
+              <!-- Reset Data Danger Zone -->
+              <div class="p-5 rounded-2xl bg-rose-950/15 border border-rose-500/20 space-y-2">
+                <h3 class="text-xs font-bold uppercase tracking-wider text-rose-400">Danger Zone</h3>
+                <p class="text-xs text-slate-400">Wipe all study sessions, milestones, and diary entries from this browser.</p>
+                <button onclick="clearAllData()" class="mt-2 py-2 px-4 rounded-xl bg-rose-900/30 hover:bg-rose-900/50 text-rose-300 border border-rose-700/40 text-xs font-bold transition">
+                  Delete All Local Data
+                </button>
+              </div>
+
+            </div>
+
+            <!-- Right Column: PIN Config & Storage Footprint -->
+            <div class="space-y-5">
+              
+              <!-- Change PIN Box -->
+              <div class="glass-card p-5 rounded-2xl space-y-3">
+                <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400">Diary Security PIN</h3>
+                <p class="text-xs text-slate-400">Set a 4-digit passcode to protect your journal.</p>
+                <div class="flex items-center gap-2 pt-1">
+                  <input id="newPinSettingInput" type="password" maxlength="4" placeholder="4 digits" class="w-28 px-3 py-2 text-xs font-mono tracking-widest text-center rounded-xl bg-[#080c14] border border-[#1c2942] text-white focus:outline-none focus:border-indigo-500">
+                  <button onclick="updateSecurityPin()" class="flex-1 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold transition">
+                    Update PIN
+                  </button>
+                </div>
+              </div>
+
+              <!-- Storage Stats Summary -->
+              <div class="glass-card p-5 rounded-2xl space-y-3">
+                <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400">Vault Footprint</h3>
+                <div class="space-y-2 text-xs">
+                  <div class="flex justify-between py-1 border-b border-[#1c2942]">
+                    <span class="text-slate-400">Study Sessions:</span>
+                    <span id="vaultStudyCount" class="font-semibold text-white">0</span>
+                  </div>
+                  <div class="flex justify-between py-1 border-b border-[#1c2942]">
+                    <span class="text-slate-400">Active Goals:</span>
+                    <span id="vaultGoalsCount" class="font-semibold text-white">0</span>
+                  </div>
+                  <div class="flex justify-between py-1 border-b border-[#1c2942]">
+                    <span class="text-slate-400">Diary Entries:</span>
+                    <span id="vaultDiaryCount" class="font-semibold text-white">0</span>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+
+          </div>
+        </section>
+
+      </main>
+    </div>
+
+    <!-- MOBILE BOTTOM NAVIGATION BAR (Visible on < 1024px screens) -->
+    <nav class="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-[#0b101c]/95 backdrop-blur-lg border-t border-[#1c2942] px-2 py-2 safe-bottom">
+      <div class="grid grid-cols-5 gap-1 text-center max-w-md mx-auto">
+        <button onclick="switchTab('dashboard')" id="nav-dashboard" class="mobile-nav-btn py-1 rounded-xl text-indigo-400 font-semibold flex flex-col items-center">
+          <i data-lucide="layout-dashboard" class="w-5 h-5"></i>
+          <span class="text-[10px] mt-0.5">Home</span>
+        </button>
+        <button onclick="switchTab('study')" id="nav-study" class="mobile-nav-btn py-1 rounded-xl text-slate-400 hover:text-slate-200 flex flex-col items-center">
+          <i data-lucide="timer" class="w-5 h-5"></i>
+          <span class="text-[10px] mt-0.5">Study</span>
+        </button>
+        <button onclick="switchTab('goals')" id="nav-goals" class="mobile-nav-btn py-1 rounded-xl text-slate-400 hover:text-slate-200 flex flex-col items-center">
+          <i data-lucide="target" class="w-5 h-5"></i>
+          <span class="text-[10px] mt-0.5">Goals</span>
+        </button>
+        <button onclick="switchTab('diary')" id="nav-diary" class="mobile-nav-btn py-1 rounded-xl text-slate-400 hover:text-slate-200 flex flex-col items-center">
+          <i data-lucide="book-open" class="w-5 h-5"></i>
+          <span class="text-[10px] mt-0.5">Diary</span>
+        </button>
+        <button onclick="switchTab('settings')" id="nav-settings" class="mobile-nav-btn py-1 rounded-xl text-slate-400 hover:text-slate-200 flex flex-col items-center">
+          <i data-lucide="hard-drive" class="w-5 h-5"></i>
+          <span class="text-[10px] mt-0.5">Vault</span>
+        </button>
+      </div>
+    </nav>
+
+    <!-- ================= MODALS ================= -->
+    
+    <!-- Modal: Add Goal -->
+    <div id="modalAddGoal" class="fixed inset-0 z-50 bg-black/75 backdrop-blur-sm hidden items-center justify-center p-4">
+      <div class="w-full max-w-md rounded-2xl glass-card p-6 space-y-4">
+        <div class="flex items-center justify-between">
+          <h3 class="text-sm font-bold text-white">Create New Goal</h3>
+          <button onclick="closeAddGoalModal()" class="text-slate-400 hover:text-white">&times;</button>
+        </div>
+        <form onsubmit="saveNewGoal(event)" class="space-y-3">
+          <div>
+            <label class="text-xs font-semibold text-slate-400">Goal Title</label>
+            <input id="goalInputTitle" type="text" required placeholder="e.g. Master Distributed Systems" class="w-full mt-1 px-3 py-2 text-xs rounded-xl bg-[#080c14] border border-[#1c2942] text-white focus:outline-none focus:border-indigo-500">
+          </div>
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="text-xs font-semibold text-slate-400">Category</label>
+              <select id="goalInputCat" class="w-full mt-1 px-3 py-2 text-xs rounded-xl bg-[#080c14] border border-[#1c2942] text-white focus:outline-none">
+                <option value="Academic">Academic</option>
+                <option value="Career">Career</option>
+                <option value="Health">Health</option>
+                <option value="Personal">Personal</option>
+              </select>
+            </div>
+            <div>
+              <label class="text-xs font-semibold text-slate-400">Target Date</label>
+              <input id="goalInputDate" type="date" class="w-full mt-1 px-3 py-2 text-xs rounded-xl bg-[#080c14] border border-[#1c2942] text-white focus:outline-none">
+            </div>
+          </div>
+          <div>
+            <label class="text-xs font-semibold text-slate-400 block mb-1">Key Action Milestones (one per line)</label>
+            <textarea id="goalInputMilestones" rows="4" placeholder="Read Raft consensus paper&#10;Implement key-value state machine&#10;Run failure injection chaos test" class="w-full px-3 py-2 text-xs rounded-xl bg-[#080c14] border border-[#1c2942] text-white focus:outline-none"></textarea>
+          </div>
+          <div class="flex gap-2 pt-2">
+            <button type="button" onclick="closeAddGoalModal()" class="flex-1 py-2.5 text-xs font-semibold rounded-xl bg-[#080c14] border border-[#1c2942] text-slate-300">Cancel</button>
+            <button type="submit" class="flex-1 py-2.5 text-xs font-semibold rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white shadow-lg shadow-indigo-600/30">Save Goal</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Modal: Write Journal Entry -->
+    <div id="modalAddDiary" class="fixed inset-0 z-50 bg-black/75 backdrop-blur-sm hidden items-center justify-center p-4">
+      <div class="w-full max-w-lg rounded-2xl glass-card p-6 space-y-4 max-h-[90vh] overflow-y-auto">
+        <div class="flex items-center justify-between">
+          <h3 class="text-sm font-bold text-white">Write Daily Reflection</h3>
+          <button onclick="closeNewDiaryModal()" class="text-slate-400 hover:text-white">&times;</button>
+        </div>
+        <form onsubmit="saveNewDiary(event)" class="space-y-3">
+          <div>
+            <label class="text-xs font-semibold text-slate-400">Headline / Title</label>
+            <input id="diaryInputTitle" type="text" placeholder="Summary of today's focus..." class="w-full mt-1 px-3 py-2 text-xs rounded-xl bg-[#080c14] border border-[#1c2942] text-white focus:outline-none focus:border-indigo-500">
+          </div>
+          <div>
+            <label class="text-xs font-semibold text-slate-400">Emotional State / Mood</label>
+            <select id="diaryInputMood" class="w-full mt-1 px-3 py-2 text-xs rounded-xl bg-[#080c14] border border-[#1c2942] text-white focus:outline-none">
+              <option value="🔥 High Focus & Momentum">🔥 High Focus & Momentum</option>
+              <option value="🧘 Calm & Disciplined">🧘 Calm & Disciplined</option>
+              <option value="😊 Optimistic & Grateful">😊 Optimistic & Grateful</option>
+              <option value="⚡ Stressed / Heavy Load">⚡ Stressed / Heavy Load</option>
+              <option value="😴 Low Energy / Fatigued">😴 Low Energy / Fatigued</option>
+            </select>
+          </div>
+          <div>
+            <label class="text-xs font-semibold text-slate-400">Reflective Thoughts</label>
+            <textarea id="diaryInputBody" rows="6" required placeholder="What breakthroughs did you experience today? What can be refined tomorrow?" class="w-full mt-1 px-3 py-2 text-xs rounded-xl bg-[#080c14] border border-[#1c2942] text-white focus:outline-none"></textarea>
+          </div>
+          <div>
+            <label class="text-xs font-semibold text-slate-400">Tags (comma-separated)</label>
+            <input id="diaryInputTags" type="text" placeholder="DeepWork, Math, Mindset" class="w-full mt-1 px-3 py-2 text-xs rounded-xl bg-[#080c14] border border-[#1c2942] text-white focus:outline-none">
+          </div>
+          <div class="flex gap-2 pt-2">
+            <button type="button" onclick="closeNewDiaryModal()" class="flex-1 py-2.5 text-xs font-semibold rounded-xl bg-[#080c14] border border-[#1c2942] text-slate-300">Discard</button>
+            <button type="submit" class="flex-1 py-2.5 text-xs font-semibold rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white shadow-lg shadow-indigo-600/30">Save Privately</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Modal: Manual Study Log -->
+    <div id="modalManualStudy" class="fixed inset-0 z-50 bg-black/75 backdrop-blur-sm hidden items-center justify-center p-4">
+      <div class="w-full max-w-sm rounded-2xl glass-card p-6 space-y-4">
+        <div class="flex items-center justify-between">
+          <h3 class="text-sm font-bold text-white">Manual Study Log</h3>
+          <button onclick="closeManualStudyModal()" class="text-slate-400 hover:text-white">&times;</button>
+        </div>
+        <form onsubmit="saveManualStudyLog(event)" class="space-y-3">
+          <div>
+            <label class="text-xs font-semibold text-slate-400">Subject</label>
+            <input id="manualStudySubject" type="text" required placeholder="e.g. Linear Algebra, Rust" class="w-full mt-1 px-3 py-2 text-xs rounded-xl bg-[#080c14] border border-[#1c2942] text-white focus:outline-none focus:border-indigo-500">
+          </div>
+          <div>
+            <label class="text-xs font-semibold text-slate-400">Duration (Minutes)</label>
+            <input id="manualStudyMins" type="number" min="1" max="480" value="45" required class="w-full mt-1 px-3 py-2 text-xs rounded-xl bg-[#080c14] border border-[#1c2942] text-white focus:outline-none">
+          </div>
+          <div>
+            <label class="text-xs font-semibold text-slate-400">Topics & Concepts Covered</label>
+            <input id="manualStudyNotes" type="text" placeholder="Key chapters or problems worked on" class="w-full mt-1 px-3 py-2 text-xs rounded-xl bg-[#080c14] border border-[#1c2942] text-white focus:outline-none">
+          </div>
+          <div class="flex gap-2 pt-2">
+            <button type="button" onclick="closeManualStudyModal()" class="flex-1 py-2.5 text-xs font-semibold rounded-xl bg-[#080c14] border border-[#1c2942] text-slate-300">Cancel</button>
+            <button type="submit" class="flex-1 py-2.5 text-xs font-semibold rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white shadow-lg shadow-indigo-600/30">Log Session</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Modal: PWA Install Help -->
+    <div id="modalInstallGuide" class="fixed inset-0 z-50 bg-black/75 backdrop-blur-sm hidden items-center justify-center p-4">
+      <div class="w-full max-w-sm rounded-2xl glass-card p-6 space-y-4">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-2">
+            <i data-lucide="smartphone" class="w-5 h-5 text-indigo-400"></i>
+            <h3 class="text-sm font-bold text-white">Install on Mobile Device</h3>
+          </div>
+          <button onclick="closeInstallGuide()" class="text-slate-400 hover:text-white">&times;</button>
+        </div>
+        <p class="text-xs text-slate-400 leading-relaxed">
+          Because this is a responsive Progressive Web App, you don't need an App Store. Add it directly to your home screen:
+        </p>
+        <div class="space-y-2.5 text-xs text-slate-300">
+          <div class="p-3 rounded-xl bg-[#080c14] border border-[#1c2942]">
+            <strong class="text-indigo-400 block mb-1">iPhone (Safari):</strong>
+            Tap the <span class="text-white font-semibold">Share icon</span> (box with up arrow) &rarr; scroll down & select <span class="text-white font-semibold">"Add to Home Screen"</span>.
+          </div>
+          <div class="p-3 rounded-xl bg-[#080c14] border border-[#1c2942]">
+            <strong class="text-emerald-400 block mb-1">Android (Chrome):</strong>
+            Tap the <span class="text-white font-semibold">Three dots (⋮)</span> menu &rarr; choose <span class="text-white font-semibold">"Install app"</span> or "Add to Home screen".
+          </div>
+        </div>
+        <button onclick="closeInstallGuide()" class="w-full py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold transition">
+          Got It
+        </button>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    // Web Audio Chime Synthesis (Zero external audio files needed)
+    function playChime() {
+      try {
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(523.25, audioCtx.currentTime); // C5
+        osc.frequency.exponentialRampToValueAtTime(783.99, audioCtx.currentTime + 0.35); // G5
+        gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.7);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.7);
+      } catch (e) {
+        console.log('Audio playback prevented');
+      }
+    }
+
+    // Storage Keys
+    const DB_KEYS = {
+      STUDY_LOGS: 'lifeos_study_logs_pc_v2',
+      GOALS: 'lifeos_goals_pc_v2',
+      DIARY: 'lifeos_diary_pc_v2',
+      PIN: 'lifeos_diary_pin_pc_v2'
+    };
+
+    // Default Seed Data
+    const DEFAULT_GOALS = [
+      {
+        id: 'g-101',
+        title: 'Master Full-Stack Distributed Systems',
+        category: 'Career',
+        deadline: '2026-11-15',
+        milestones: [
+          { id: 'm-1', text: 'Study Raft and Paxos consensus algorithms', completed: true },
+          { id: 'm-2', text: 'Build multi-node key-value store in memory', completed: true },
+          { id: 'm-3', text: 'Benchmark replication latency and partitions', completed: false },
+          { id: 'm-4', text: 'Publish technical deep-dive architectural blog', completed: false }
+        ]
+      },
+      {
+        id: 'g-102',
+        title: 'Complete 100 Hours of Focused Study',
+        category: 'Academic',
+        deadline: '2026-12-30',
+        milestones: [
+          { id: 'm-5', text: 'Reach 25 hours milestone', completed: true },
+          { id: 'm-6', text: 'Reach 50 hours milestone', completed: false },
+          { id: 'm-7', text: 'Reach 75 hours milestone', completed: false },
+          { id: 'm-8', text: 'Complete 100-hour mastery milestone', completed: false }
+        ]
+      }
+    ];
+
+    const DEFAULT_STUDY = [
+      {
+        id: 's-101',
+        subject: 'Computer Science',
+        durationMinutes: 50,
+        timestamp: new Date(Date.now() - 3600000 * 3).toISOString(),
+        notes: 'Studied Raft consensus log replication',
+        confidence: 5
+      },
+      {
+        id: 's-102',
+        subject: 'Mathematics',
+        durationMinutes: 45,
+        timestamp: new Date(Date.now() - 86400000).toISOString(),
+        notes: 'Linear algebra and eigenvalues practice',
+        confidence: 4
+      }
+    ];
+
+    const DEFAULT_DIARY = [
+      {
+        id: 'd-101',
+        date: new Date().toISOString().split('T')[0],
+        title: 'Focus breakthroughs & clarity',
+        content: 'Had a strong 2-hour morning block without social media distractions. Building solid momentum on personal goals and keeping consistent.',
+        mood: '🔥 High Focus & Momentum',
+        tags: ['Discipline', 'Focus', 'Coding']
+      },
+      {
+        id: 'd-102',
+        date: new Date(Date.now() - 86400000).toISOString().split('T')[0],
+        title: 'Evening reflections on sleep & routine',
+        content: 'Keeping the evening wind-down strictly screen-free. Quality of focus in the morning is noticeably higher when sleep is safeguarded.',
+        mood: '🧘 Calm & Disciplined',
+        tags: ['Health', 'Routine']
+      }
+    ];
+
+    // Reactive State
+    let studyLogs = JSON.parse(localStorage.getItem(DB_KEYS.STUDY_LOGS)) || DEFAULT_STUDY;
+    let goals = JSON.parse(localStorage.getItem(DB_KEYS.GOALS)) || DEFAULT_GOALS;
+    let diaryEntries = JSON.parse(localStorage.getItem(DB_KEYS.DIARY)) || DEFAULT_DIARY;
+    let diaryPin = localStorage.getItem(DB_KEYS.PIN) || '1234';
+    let isDiaryLocked = true;
+    let currentStudyRating = 4;
+    let selectedGoalCategory = 'All';
+    let selectedDiaryEntryId = diaryEntries[0]?.id || null;
+
+    // Timer Variables
+    let timerMode = 'pomodoro';
+    let timerDurationMins = 25;
+    let timerSecondsLeft = 25 * 60;
+    let stopwatchSeconds = 0;
+    let timerInterval = null;
+    let isTimerRunning = false;
+
+    function showToast(msg) {
+      const box = document.getElementById('toastBox');
+      const text = document.getElementById('toastText');
+      text.innerText = msg;
+      box.classList.remove('opacity-0', 'translate-y-[-8px]');
+      box.classList.add('opacity-100', 'translate-y-0');
+      setTimeout(() => {
+        box.classList.remove('opacity-100', 'translate-y-0');
+        box.classList.add('opacity-0', 'translate-y-[-8px]');
+      }, 2500);
+    }
+
+    function switchTab(tabId) {
+      const tabs = ['dashboard', 'study', 'goals', 'diary', 'settings'];
+      tabs.forEach(t => {
+        const view = document.getElementById(`view-${t}`);
+        const sideBtn = document.getElementById(`side-${t}`);
+        const mobBtn = document.getElementById(`nav-${t}`);
+
+        if (t === tabId) {
+          view.classList.remove('hidden');
+          // Desktop sidebar styling
+          if (sideBtn) {
+            sideBtn.className = 'side-nav-btn w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-sm font-semibold transition group bg-indigo-600/10 text-indigo-400 border border-indigo-500/30';
+          }
+          // Mobile bottom bar styling
+          if (mobBtn) {
+            mobBtn.classList.remove('text-slate-400');
+            mobBtn.classList.add('text-indigo-400', 'font-bold');
+          }
+        } else {
+          view.classList.add('hidden');
+          if (sideBtn) {
+            sideBtn.className = 'side-nav-btn w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-sm font-semibold transition group text-slate-400 hover:text-slate-200 hover:bg-[#141e33] border border-transparent';
+          }
+          if (mobBtn) {
+            mobBtn.classList.remove('text-indigo-400', 'font-bold');
+            mobBtn.classList.add('text-slate-400');
+          }
         }
+      });
 
-        // GSAP Startup Entrance Orchestration
-        window.addEventListener('DOMContentLoaded', () => {
-            const tl = gsap.timeline({ defaults: { ease: 'power3.out' } });
+      if (tabId === 'dashboard') renderDashboard();
+      if (tabId === 'study') renderStudyLogs();
+      if (tabId === 'goals') renderGoals();
+      if (tabId === 'diary') renderDiary();
+      if (tabId === 'settings') renderSettings();
+      lucide.createIcons();
+    }
 
-            // 1. Navigation Slide & Fade
-            tl.from('#mainNavbar', {
-                y: -30,
-                opacity: 0,
-                duration: 0.7,
-                ease: 'power2.out'
-            })
-                // 2. Hero Typography & Content Stagger
-                .from('.gsap-hero-item', {
-                    y: 25,
-                    opacity: 0,
-                    duration: 0.65,
-                    stagger: 0.1
-                }, "-=0.35")
-                // 3. Central Glassmorphic Card Reveal
-                .from('#mainCard', {
-                    scale: 0.94,
-                    y: 35,
-                    opacity: 0,
-                    duration: 0.8,
-                    ease: 'power3.out'
-                }, "-=0.5")
-                // 4. Floating Micro Badges Pop-in
-                .from('.gsap-float-badge', {
-                    scale: 0.8,
-                    opacity: 0,
-                    duration: 0.5,
-                    stagger: 0.15,
-                    ease: 'back.out(1.7)'
-                }, "-=0.3");
+    function setTimerMode(mode, mins) {
+      clearInterval(timerInterval);
+      isTimerRunning = false;
+      timerMode = mode;
+      timerDurationMins = mins;
 
-            // Continuous Subtle Floating Loop for Badges
-            gsap.to('#floatTop', {
-                y: -10,
-                duration: 2.8,
-                repeat: -1,
-                yoyo: true,
-                ease: 'sine.inOut'
-            });
+      const btnPomo = document.getElementById('btnModePomo');
+      const btnBreak = document.getElementById('btnModeBreak');
+      const btnStopwatch = document.getElementById('btnModeStopwatch');
+      const btnFinish = document.getElementById('btnStopwatchFinish');
 
-            gsap.to('#floatBottom', {
-                y: 10,
-                duration: 3.2,
-                repeat: -1,
-                yoyo: true,
-                ease: 'sine.inOut',
-                delay: 0.4
-            });
+      [btnPomo, btnBreak, btnStopwatch].forEach(b => {
+        b.className = 'flex-1 py-2 text-xs font-semibold rounded-lg text-slate-400 hover:text-white transition';
+      });
+
+      if (mode === 'pomodoro') {
+        btnPomo.className = 'flex-1 py-2 text-xs font-bold rounded-lg bg-indigo-600 text-white transition';
+        timerSecondsLeft = 25 * 60;
+        btnFinish.classList.add('hidden');
+        document.getElementById('timerStatusText').innerText = 'Ready for 25-minute Pomodoro focus.';
+        document.getElementById('sideTimerMiniStatus').innerText = 'Pomodoro ready';
+      } else if (mode === 'break') {
+        btnBreak.className = 'flex-1 py-2 text-xs font-bold rounded-lg bg-indigo-600 text-white transition';
+        timerSecondsLeft = 5 * 60;
+        btnFinish.classList.add('hidden');
+        document.getElementById('timerStatusText').innerText = '5-minute recharge sprint.';
+        document.getElementById('sideTimerMiniStatus').innerText = 'Break ready';
+      } else {
+        btnStopwatch.className = 'flex-1 py-2 text-xs font-bold rounded-lg bg-indigo-600 text-white transition';
+        stopwatchSeconds = 0;
+        btnFinish.classList.remove('hidden');
+        document.getElementById('timerStatusText').innerText = 'Stopwatch count-up ready.';
+        document.getElementById('sideTimerMiniStatus').innerText = 'Stopwatch ready';
+      }
+
+      updateTimerDisplay();
+      updateTimerButtonUI();
+    }
+
+    function toggleTimer() {
+      if (isTimerRunning) {
+        clearInterval(timerInterval);
+        isTimerRunning = false;
+        document.getElementById('timerStatusText').innerText = 'Session paused.';
+        document.getElementById('sideTimerMiniStatus').innerText = 'Paused';
+      } else {
+        isTimerRunning = true;
+        document.getElementById('timerStatusText').innerText = 'Deep concentration in progress...';
+        document.getElementById('sideTimerMiniStatus').innerText = 'Active focus';
+        timerInterval = setInterval(() => {
+          if (timerMode === 'stopwatch') {
+            stopwatchSeconds++;
+            updateTimerDisplay();
+          } else {
+            if (timerSecondsLeft <= 1) {
+              clearInterval(timerInterval);
+              isTimerRunning = false;
+              timerSecondsLeft = 0;
+              updateTimerDisplay();
+              playChime();
+              showToast('🎉 Focus block completed!');
+              saveStudySession(timerDurationMins);
+              return;
+            }
+            timerSecondsLeft--;
+            updateTimerDisplay();
+          }
+        }, 1000);
+      }
+      updateTimerButtonUI();
+    }
+
+    function resetTimer() {
+      clearInterval(timerInterval);
+      isTimerRunning = false;
+      if (timerMode === 'stopwatch') {
+        stopwatchSeconds = 0;
+      } else {
+        timerSecondsLeft = timerDurationMins * 60;
+      }
+      document.getElementById('timerStatusText').innerText = 'Timer reset.';
+      document.getElementById('sideTimerMiniStatus').innerText = 'Idle';
+      updateTimerDisplay();
+      updateTimerButtonUI();
+    }
+
+    function updateTimerDisplay() {
+      const totalSecs = timerMode === 'stopwatch' ? stopwatchSeconds : timerSecondsLeft;
+      const m = Math.floor(totalSecs / 60);
+      const s = totalSecs % 60;
+      const formatted = `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+      document.getElementById('timerDisplay').innerText = formatted;
+      const sideMini = document.getElementById('sideTimerMini');
+      if (sideMini) sideMini.innerText = formatted;
+    }
+
+    function updateTimerButtonUI() {
+      const text = document.getElementById('timerPlayText');
+      if (isTimerRunning) {
+        text.innerText = 'Pause';
+      } else {
+        text.innerText = timerMode === 'stopwatch' ? 'Start Count' : 'Start Focus';
+      }
+      lucide.createIcons();
+    }
+
+    function finishStopwatch() {
+      if (stopwatchSeconds < 30) {
+        showToast('Session too brief (<30s).');
+        resetTimer();
+        return;
+      }
+      const mins = Math.max(1, Math.round(stopwatchSeconds / 60));
+      saveStudySession(mins);
+      resetTimer();
+    }
+
+    function setStudyRating(num) {
+      currentStudyRating = num;
+      const stars = document.querySelectorAll('#starContainer .star-btn');
+      stars.forEach((s, idx) => {
+        if (idx < num) {
+          s.classList.remove('text-slate-600');
+          s.classList.add('text-amber-400');
+        } else {
+          s.classList.remove('text-amber-400');
+          s.classList.add('text-slate-600');
+        }
+      });
+    }
+
+    function saveStudySession(mins) {
+      const subj = document.getElementById('timerSubject').value;
+      const notes = document.getElementById('timerNotes').value.trim() || 'Focused concentration sprint';
+      const log = {
+        id: 's-' + Date.now(),
+        subject: subj,
+        durationMinutes: mins,
+        timestamp: new Date().toISOString(),
+        notes: notes,
+        confidence: currentStudyRating
+      };
+      studyLogs.unshift(log);
+      localStorage.setItem(DB_KEYS.STUDY_LOGS, JSON.stringify(studyLogs));
+      document.getElementById('timerNotes').value = '';
+      showToast(`Logged ${mins}m in ${subj}!`);
+      renderStudyLogs();
+      renderDashboard();
+      updateVaultStats();
+    }
+
+    function deleteStudyLog(id) {
+      studyLogs = studyLogs.filter(item => item.id !== id);
+      localStorage.setItem(DB_KEYS.STUDY_LOGS, JSON.stringify(studyLogs));
+      renderStudyLogs();
+      renderDashboard();
+      updateVaultStats();
+      showToast('Session removed');
+    }
+
+    function renderStudyLogs() {
+      const container = document.getElementById('studyLogsList');
+      const counter = document.getElementById('studyLogsCount');
+      if (counter) counter.innerText = `${studyLogs.length} sessions`;
+
+      if (studyLogs.length === 0) {
+        container.innerHTML = `<div class="p-8 text-center text-xs text-slate-500">No study logs yet. Complete a timer sprint or log manually.</div>`;
+        return;
+      }
+
+      container.innerHTML = studyLogs.map(item => `
+        <div class="p-4 rounded-2xl glass-card flex items-start justify-between gap-3 group">
+          <div class="flex items-start gap-3">
+            <div class="w-11 h-11 rounded-xl bg-indigo-500/10 text-indigo-400 font-bold text-xs flex flex-col items-center justify-center shrink-0 border border-indigo-500/20">
+              <span class="text-sm leading-none">${item.durationMinutes}</span>
+              <span class="text-[9px] font-normal mt-0.5">min</span>
+            </div>
+            <div>
+              <div class="flex items-center gap-2">
+                <h4 class="text-xs font-bold text-white">${item.subject}</h4>
+                <span class="text-[10px] text-slate-500">${new Date(item.timestamp).toLocaleDateString([], { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}</span>
+              </div>
+              <p class="text-xs text-slate-400 mt-1">${item.notes}</p>
+              <div class="text-amber-400 text-xs mt-1.5 tracking-wider">
+                ${'★'.repeat(item.confidence || 3)}${'☆'.repeat(5 - (item.confidence || 3))}
+              </div>
+            </div>
+          </div>
+          <button onclick="deleteStudyLog('${item.id}')" class="text-slate-600 hover:text-rose-400 p-1.5 rounded-lg hover:bg-[#080c14] transition" title="Delete log">
+            <i data-lucide="trash-2" class="w-4 h-4"></i>
+          </button>
+        </div>
+      `).join('');
+      lucide.createIcons();
+    }
+
+    function filterGoalsCategory(cat) {
+      selectedGoalCategory = cat;
+      const cats = ['All', 'Career', 'Academic', 'Health', 'Personal'];
+      cats.forEach(c => {
+        const btn = document.getElementById(`goalCatBtn-${c}`);
+        if (btn) {
+          if (c === cat) {
+            btn.className = 'px-3.5 py-1.5 rounded-xl font-semibold bg-indigo-600 text-white transition';
+          } else {
+            btn.className = 'px-3.5 py-1.5 rounded-xl font-semibold bg-[#141e33] text-slate-400 hover:text-white transition';
+          }
+        }
+      });
+      renderGoals();
+    }
+
+    function renderGoals() {
+      const container = document.getElementById('goalsList');
+      const filtered = selectedGoalCategory === 'All' 
+        ? goals 
+        : goals.filter(g => g.category === selectedGoalCategory);
+
+      if (filtered.length === 0) {
+        container.innerHTML = `<div class="col-span-full p-12 text-center text-xs text-slate-500">No goals in this category. Click "+ Add Goal" to establish one.</div>`;
+        return;
+      }
+
+      container.innerHTML = filtered.map(g => {
+        const total = g.milestones.length;
+        const done = g.milestones.filter(m => m.completed).length;
+        const pct = total > 0 ? Math.round((done / total) * 100) : 0;
+
+        return `
+          <div class="glass-card p-5 rounded-3xl space-y-4 flex flex-col justify-between">
+            <div class="space-y-3">
+              <div class="flex items-start justify-between gap-2">
+                <div>
+                  <span class="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-md bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">
+                    ${g.category}
+                  </span>
+                  <h3 class="text-sm font-bold text-white mt-1.5 leading-snug">${g.title}</h3>
+                  ${g.deadline ? `<span class="text-[11px] text-slate-500 mt-0.5 block">Target: ${g.deadline}</span>` : ''}
+                </div>
+                <button onclick="deleteGoal('${g.id}')" class="text-slate-600 hover:text-rose-400 p-1" title="Delete Goal">
+                  <i data-lucide="trash-2" class="w-4 h-4"></i>
+                </button>
+              </div>
+
+              <div>
+                <div class="flex justify-between text-[11px] font-semibold text-slate-400 mb-1">
+                  <span>${done} of ${total} steps done</span>
+                  <span class="text-indigo-400 font-mono">${pct}%</span>
+                </div>
+                <div class="w-full bg-[#080c14] h-2 rounded-full overflow-hidden border border-[#1c2942]">
+                  <div class="h-full bg-indigo-500 transition-all duration-500" style="width: ${pct}%"></div>
+                </div>
+              </div>
+
+              <div class="space-y-2 pt-1">
+                ${g.milestones.map(m => `
+                  <div onclick="toggleMilestone('${g.id}', '${m.id}')" class="flex items-center gap-2.5 p-2 rounded-xl hover:bg-[#080c14] cursor-pointer transition select-none group">
+                    <span class="w-4 h-4 rounded-md border ${m.completed ? 'bg-emerald-500 border-emerald-500 text-white' : 'border-slate-600 group-hover:border-indigo-400'} flex items-center justify-center text-[10px] font-bold">
+                      ${m.completed ? '✓' : ''}
+                    </span>
+                    <span class="text-xs ${m.completed ? 'line-through text-slate-500' : 'text-slate-300'}">
+                      ${m.text}
+                    </span>
+                  </div>
+                `).join('')}
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+      lucide.createIcons();
+    }
+
+    function toggleMilestone(goalId, milestoneId) {
+      goals = goals.map(g => {
+        if (g.id !== goalId) return g;
+        return {
+          ...g,
+          milestones: g.milestones.map(m => m.id === milestoneId ? { ...m, completed: !m.completed } : m)
+        };
+      });
+      localStorage.setItem(DB_KEYS.GOALS, JSON.stringify(goals));
+      renderGoals();
+      renderDashboard();
+    }
+
+    function deleteGoal(id) {
+      goals = goals.filter(g => g.id !== id);
+      localStorage.setItem(DB_KEYS.GOALS, JSON.stringify(goals));
+      renderGoals();
+      renderDashboard();
+      updateVaultStats();
+      showToast('Goal removed');
+    }
+
+    function saveNewGoal(e) {
+      e.preventDefault();
+      const title = document.getElementById('goalInputTitle').value.trim();
+      const cat = document.getElementById('goalInputCat').value;
+      const date = document.getElementById('goalInputDate').value;
+      const msRaw = document.getElementById('goalInputMilestones').value.trim();
+
+      const milestones = msRaw
+        ? msRaw.split('\n').filter(s => s.trim()).map((t, idx) => ({ id: 'm-' + Date.now() + '-' + idx, text: t.trim(), completed: false }))
+        : [{ id: 'm-' + Date.now() + '-0', text: 'Initial target milestone', completed: false }];
+
+      goals.unshift({
+        id: 'g-' + Date.now(),
+        title,
+        category: cat,
+        deadline: date,
+        milestones
+      });
+
+      localStorage.setItem(DB_KEYS.GOALS, JSON.stringify(goals));
+      closeAddGoalModal();
+      document.getElementById('goalInputTitle').value = '';
+      document.getElementById('goalInputMilestones').value = '';
+      showToast('🎯 Goal created!');
+      renderGoals();
+      renderDashboard();
+      updateVaultStats();
+    }
+
+    function unlockDiary() {
+      const entered = document.getElementById('diaryPinInput').value;
+      if (entered === diaryPin) {
+        isDiaryLocked = false;
+        document.getElementById('diaryLockScreen').classList.add('hidden');
+        document.getElementById('diaryUnlockedScreen').classList.remove('hidden');
+        document.getElementById('pinErrorMsg').classList.add('hidden');
+        document.getElementById('diaryPinInput').value = '';
+        renderDiary();
+      } else {
+        document.getElementById('pinErrorMsg').classList.remove('hidden');
+        document.getElementById('diaryPinInput').value = '';
+      }
+    }
+
+    function lockDiary() {
+      isDiaryLocked = true;
+      document.getElementById('diaryLockScreen').classList.remove('hidden');
+      document.getElementById('diaryUnlockedScreen').classList.add('hidden');
+    }
+
+    function selectDiaryEntry(id) {
+      selectedDiaryEntryId = id;
+      renderDiary();
+    }
+
+    function renderDiary() {
+      if (isDiaryLocked) return;
+      const listContainer = document.getElementById('diaryList');
+      const readerPane = document.getElementById('diaryReaderPane');
+      const query = (document.getElementById('diarySearchInput')?.value || '').toLowerCase();
+
+      const filtered = diaryEntries.filter(d => 
+        d.title.toLowerCase().includes(query) ||
+        d.content.toLowerCase().includes(query) ||
+        (d.tags && d.tags.some(t => t.toLowerCase().includes(query)))
+      );
+
+      if (filtered.length === 0) {
+        listContainer.innerHTML = `<div class="p-8 text-center text-xs text-slate-500">No reflections matching query.</div>`;
+        readerPane.innerHTML = `<div class="text-center py-16 text-slate-500 text-xs">Select or write an entry to preview.</div>`;
+        return;
+      }
+
+      // If selected entry is not in filtered list, select the first
+      const currentSelected = filtered.find(f => f.id === selectedDiaryEntryId) || filtered[0];
+      selectedDiaryEntryId = currentSelected.id;
+
+      // Render Left List
+      listContainer.innerHTML = filtered.map(item => {
+        const isSelected = item.id === selectedDiaryEntryId;
+        return `
+          <div onclick="selectDiaryEntry('${item.id}')" class="p-3.5 rounded-2xl glass-card cursor-pointer transition select-none ${isSelected ? 'border-indigo-500/70 bg-indigo-950/20' : 'hover:border-[#2b3e63]'}">
+            <div class="flex items-center justify-between">
+              <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#080c14] text-indigo-300 border border-[#1c2942]">
+                ${item.mood}
+              </span>
+              <span class="text-[10px] text-slate-500">${item.date}</span>
+            </div>
+            <h4 class="text-xs font-bold text-white mt-1.5 line-clamp-1">${item.title}</h4>
+            <p class="text-xs text-slate-400 mt-1 line-clamp-2">${item.content}</p>
+          </div>
+        `;
+      }).join('');
+
+      // Render Right Detail Pane
+      if (currentSelected) {
+        readerPane.innerHTML = `
+          <div class="space-y-4">
+            <div class="flex items-start justify-between border-b border-[#1c2942] pb-4">
+              <div>
+                <div class="flex items-center gap-2 mb-1.5">
+                  <span class="text-xs font-bold px-2.5 py-1 rounded-full bg-[#080c14] text-indigo-300 border border-[#1c2942]">
+                    ${currentSelected.mood}
+                  </span>
+                  <span class="text-xs text-slate-400 font-medium">${currentSelected.date}</span>
+                </div>
+                <h3 class="text-lg font-black text-white leading-tight">${currentSelected.title}</h3>
+              </div>
+              <button onclick="deleteDiary('${currentSelected.id}')" class="text-slate-500 hover:text-rose-400 p-2 rounded-xl hover:bg-[#080c14] transition" title="Delete Entry">
+                <i data-lucide="trash-2" class="w-4 h-4"></i>
+              </button>
+            </div>
+            <div class="text-sm text-slate-200 leading-relaxed whitespace-pre-wrap font-sans min-h-[160px]">
+              ${currentSelected.content}
+            </div>
+            ${currentSelected.tags && currentSelected.tags.length ? `
+              <div class="flex flex-wrap gap-1.5 pt-4 border-t border-[#1c2942]">
+                ${currentSelected.tags.map(t => `<span class="text-xs text-indigo-400 bg-indigo-500/10 px-2.5 py-1 rounded-lg border border-indigo-500/20 font-medium">#${t}</span>`).join('')}
+              </div>
+            ` : ''}
+          </div>
+        `;
+      }
+      lucide.createIcons();
+    }
+
+    function saveNewDiary(e) {
+      e.preventDefault();
+      const title = document.getElementById('diaryInputTitle').value.trim() || 'Daily Reflection';
+      const mood = document.getElementById('diaryInputMood').value;
+      const body = document.getElementById('diaryInputBody').value.trim();
+      const tagsRaw = document.getElementById('diaryInputTags').value;
+
+      const tags = tagsRaw.split(',').map(s => s.trim()).filter(Boolean);
+
+      const newEntry = {
+        id: 'd-' + Date.now(),
+        date: new Date().toISOString().split('T')[0],
+        title,
+        mood,
+        content: body,
+        tags: tags.length ? tags : ['General']
+      };
+
+      diaryEntries.unshift(newEntry);
+      selectedDiaryEntryId = newEntry.id;
+      localStorage.setItem(DB_KEYS.DIARY, JSON.stringify(diaryEntries));
+      closeNewDiaryModal();
+      document.getElementById('diaryInputTitle').value = '';
+      document.getElementById('diaryInputBody').value = '';
+      document.getElementById('diaryInputTags').value = '';
+      showToast('📖 Journal secured!');
+      renderDiary();
+      renderDashboard();
+      updateVaultStats();
+    }
+
+    function deleteDiary(id) {
+      diaryEntries = diaryEntries.filter(d => d.id !== id);
+      localStorage.setItem(DB_KEYS.DIARY, JSON.stringify(diaryEntries));
+      selectedDiaryEntryId = diaryEntries[0]?.id || null;
+      renderDiary();
+      renderDashboard();
+      updateVaultStats();
+      showToast('Entry deleted');
+    }
+
+    function renderDashboard() {
+      // 1. Study time calculations
+      const todayStr = new Date().toDateString();
+      const todayMins = studyLogs
+        .filter(l => new Date(l.timestamp).toDateString() === todayStr)
+        .reduce((sum, item) => sum + item.durationMinutes, 0);
+
+      const oneWeekAgo = Date.now() - 7 * 24 * 60 * 60 * 1000;
+      const weekMins = studyLogs
+        .filter(l => new Date(l.timestamp).getTime() >= oneWeekAgo)
+        .reduce((sum, item) => sum + item.durationMinutes, 0);
+
+      document.getElementById('dashTodayHours').innerText = (todayMins / 60).toFixed(1);
+      document.getElementById('dashTodayMinutes').innerText = `${todayMins} mins logged today`;
+      document.getElementById('dashWeekHours').innerText = (weekMins / 60).toFixed(1);
+
+      // 2. Goal completion stats
+      let totalM = 0;
+      let doneM = 0;
+      goals.forEach(g => {
+        g.milestones.forEach(m => {
+          totalM++;
+          if (m.completed) doneM++;
         });
-    </script>
-</body>
+      });
+      const pct = totalM > 0 ? Math.round((doneM / totalM) * 100) : 0;
+      document.getElementById('dashGoalPercent').innerText = `${pct}%`;
+      document.getElementById('dashGoalBar').style.width = `${pct}%`;
 
+      // 3. Total entries
+      document.getElementById('dashTotalEntries').innerText = diaryEntries.length;
+
+      // 4. Goals Preview (top 2)
+      const goalsPreviewContainer = document.getElementById('dashGoalsPreview');
+      if (goals.length === 0) {
+        goalsPreviewContainer.innerHTML = `<p class="text-xs text-slate-500 italic">No goals defined yet.</p>`;
+      } else {
+        goalsPreviewContainer.innerHTML = goals.slice(0, 2).map(g => {
+          const total = g.milestones.length;
+          const done = g.milestones.filter(m => m.completed).length;
+          const p = total > 0 ? Math.round((done / total) * 100) : 0;
+          return `
+            <div class="p-3 rounded-xl bg-[#080c14] border border-[#1c2942] space-y-2">
+              <div class="flex justify-between items-center text-xs">
+                <span class="font-bold text-white">${g.title}</span>
+                <span class="font-mono text-indigo-400">${p}%</span>
+              </div>
+              <div class="w-full bg-[#141e33] h-1.5 rounded-full overflow-hidden">
+                <div class="h-full bg-indigo-500" style="width: ${p}%"></div>
+              </div>
+            </div>
+          `;
+        }).join('');
+      }
+
+      // 5. Recent Study Preview (top 3)
+      const studyPreviewContainer = document.getElementById('dashStudyPreview');
+      if (studyLogs.length === 0) {
+        studyPreviewContainer.innerHTML = `<p class="text-xs text-slate-500 italic">No sessions logged yet.</p>`;
+      } else {
+        studyPreviewContainer.innerHTML = studyLogs.slice(0, 3).map(s => `
+          <div class="p-2.5 rounded-xl bg-[#080c14] border border-[#1c2942] flex items-center justify-between text-xs">
+            <div class="flex items-center gap-2.5">
+              <span class="font-bold text-indigo-400 font-mono">${s.durationMinutes}m</span>
+              <span class="font-semibold text-white">${s.subject}</span>
+            </div>
+            <span class="text-[11px] text-slate-500">${new Date(s.timestamp).toLocaleDateString([], { month: 'short', day: 'numeric' })}</span>
+          </div>
+        `).join('');
+      }
+
+      // 6. Recent Diary preview
+      const previewBox = document.getElementById('dashRecentDiary');
+      if (diaryEntries.length > 0) {
+        const d = diaryEntries[0];
+        previewBox.innerHTML = `
+          <div class="space-y-1.5">
+            <div class="flex items-center gap-2 text-xs">
+              <span class="text-indigo-400 font-semibold">${d.mood}</span>
+              <span class="text-slate-500">• ${d.date}</span>
+            </div>
+            <h4 class="text-sm font-bold text-white">${d.title}</h4>
+            <p class="text-xs text-slate-400 line-clamp-2 leading-relaxed">${d.content}</p>
+          </div>
+        `;
+      } else {
+        previewBox.innerHTML = `<p class="text-xs text-slate-500 italic">No entries written yet.</p>`;
+      }
+      updateVaultStats();
+      lucide.createIcons();
+    }
+
+    function updateVaultStats() {
+      const vStudy = document.getElementById('vaultStudyCount');
+      const vGoals = document.getElementById('vaultGoalsCount');
+      const vDiary = document.getElementById('vaultDiaryCount');
+      if (vStudy) vStudy.innerText = studyLogs.length;
+      if (vGoals) vGoals.innerText = goals.length;
+      if (vDiary) vDiary.innerText = diaryEntries.length;
+
+      // Approximate localStorage size
+      try {
+        const totalBytes = new Blob([
+          localStorage.getItem(DB_KEYS.STUDY_LOGS) || '',
+          localStorage.getItem(DB_KEYS.GOALS) || '',
+          localStorage.getItem(DB_KEYS.DIARY) || ''
+        ]).size;
+        const kb = (totalBytes / 1024).toFixed(1);
+        const sideSize = document.getElementById('sideStorageSize');
+        if (sideSize) sideSize.innerText = `${kb} KB`;
+      } catch (e) {}
+    }
+
+    function renderSettings() {
+      updateVaultStats();
+    }
+
+    function exportDataJson() {
+      const data = {
+        version: '2.0-desktop',
+        exportDate: new Date().toISOString(),
+        studyLogs,
+        goals,
+        diaryEntries,
+        pin: diaryPin
+      };
+      const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `LifeOS_Backup_${new Date().toISOString().split('T')[0]}.json`;
+      a.click();
+      URL.revokeObjectURL(url);
+      showToast('Backup JSON downloaded!');
+    }
+
+    function importDataJson(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = function(evt) {
+        try {
+          const parsed = JSON.parse(evt.target.result);
+          if (parsed.studyLogs && parsed.goals && parsed.diaryEntries) {
+            studyLogs = parsed.studyLogs;
+            goals = parsed.goals;
+            diaryEntries = parsed.diaryEntries;
+            if (parsed.pin) diaryPin = parsed.pin;
+            localStorage.setItem(DB_KEYS.STUDY_LOGS, JSON.stringify(studyLogs));
+            localStorage.setItem(DB_KEYS.GOALS, JSON.stringify(goals));
+            localStorage.setItem(DB_KEYS.DIARY, JSON.stringify(diaryEntries));
+            localStorage.setItem(DB_KEYS.PIN, diaryPin);
+            renderDashboard();
+            renderStudyLogs();
+            renderGoals();
+            renderDiary();
+            updateVaultStats();
+            showToast('✅ All data restored from backup!');
+          } else {
+            showToast('Invalid backup file structure.');
+          }
+        } catch (err) {
+          showToast('Failed to parse JSON file.');
+        }
+      };
+      reader.readAsText(file);
+    }
+
+    function updateSecurityPin() {
+      const p = document.getElementById('newPinSettingInput').value.trim();
+      if (p.length === 4) {
+        diaryPin = p;
+        localStorage.setItem(DB_KEYS.PIN, p);
+        document.getElementById('newPinSettingInput').value = '';
+        showToast('PIN updated successfully!');
+      } else {
+        showToast('PIN must be 4 digits.');
+      }
+    }
+
+    function clearAllData() {
+      if (window.confirm('Delete all records from this browser? Please ensure you exported a JSON backup first.')) {
+        localStorage.clear();
+        studyLogs = [];
+        goals = [];
+        diaryEntries = [];
+        renderDashboard();
+        renderStudyLogs();
+        renderGoals();
+        renderDiary();
+        updateVaultStats();
+        showToast('All local records cleared');
+      }
+    }
+
+    // Modal Control Helpers
+    function openAddGoalModal() { document.getElementById('modalAddGoal').classList.replace('hidden', 'flex'); }
+    function closeAddGoalModal() { document.getElementById('modalAddGoal').classList.replace('flex', 'hidden'); }
+    function openNewDiaryModal() { document.getElementById('modalAddDiary').classList.replace('hidden', 'flex'); }
+    function closeNewDiaryModal() { document.getElementById('modalAddDiary').classList.replace('flex', 'hidden'); }
+    function openManualStudyModal() { document.getElementById('modalManualStudy').classList.replace('hidden', 'flex'); }
+    function closeManualStudyModal() { document.getElementById('modalManualStudy').classList.replace('flex', 'hidden'); }
+    function openInstallGuide() { document.getElementById('modalInstallGuide').classList.replace('hidden', 'flex'); }
+    function closeInstallGuide() { document.getElementById('modalInstallGuide').classList.replace('flex', 'hidden'); }
+
+    function saveManualStudyLog(e) {
+      e.preventDefault();
+      const subj = document.getElementById('manualStudySubject').value.trim();
+      const mins = parseInt(document.getElementById('manualStudyMins').value, 10);
+      const notes = document.getElementById('manualStudyNotes').value.trim() || 'Manual study entry';
+      studyLogs.unshift({
+        id: 's-' + Date.now(),
+        subject: subj,
+        durationMinutes: mins,
+        timestamp: new Date().toISOString(),
+        notes,
+        confidence: 4
+      });
+      localStorage.setItem(DB_KEYS.STUDY_LOGS, JSON.stringify(studyLogs));
+      closeManualStudyModal();
+      showToast(`Logged ${mins}m in ${subj}!`);
+      renderStudyLogs();
+      renderDashboard();
+      updateVaultStats();
+    }
+
+    window.addEventListener('keydown', (e) => {
+      // Avoid hotkeys while typing in text inputs or textareas
+      const tag = document.activeElement?.tagName?.toLowerCase();
+      if (tag === 'input' || tag === 'textarea' || tag === 'select') {
+        if (e.key === 'Escape') {
+          closeAddGoalModal();
+          closeNewDiaryModal();
+          closeManualStudyModal();
+          closeInstallGuide();
+        }
+        return;
+      }
+
+      if (e.code === 'Space') {
+        e.preventDefault();
+        toggleTimer();
+      } else if (e.key === 'r' || e.key === 'R') {
+        resetTimer();
+      } else if (e.key === '1') {
+        switchTab('dashboard');
+      } else if (e.key === '2') {
+        switchTab('study');
+      } else if (e.key === '3') {
+        switchTab('goals');
+      } else if (e.key === '4') {
+        switchTab('diary');
+      } else if (e.key === '5') {
+        switchTab('settings');
+      } else if (e.key === 'Escape') {
+        closeAddGoalModal();
+        closeNewDiaryModal();
+        closeManualStudyModal();
+        closeInstallGuide();
+      }
+    });
+
+    // Bootstrapping App
+    window.addEventListener('DOMContentLoaded', () => {
+      renderDashboard();
+      renderStudyLogs();
+      renderGoals();
+      updateTimerDisplay();
+      updateVaultStats();
+      lucide.createIcons();
+    });
+  </script>
+</body>
 </html>
